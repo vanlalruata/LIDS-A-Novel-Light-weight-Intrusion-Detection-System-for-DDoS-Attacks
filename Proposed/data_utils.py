@@ -94,7 +94,8 @@ def load_dataset(PATH, nrows):
                          'SimillarHTTP', ' Source Port', ' Destination IP', ' Destination Port']
 
     filenames = ['TFTP.csv', 'DrDoS_SNMP.csv', 'DrDoS_DNS.csv', 'DrDoS_MSSQL.csv', 'DrDoS_SSDP.csv',
-                 'DrDoS_NetBIOS.csv', 'DrDoS_LDAP.csv', 'DrDoS_NTP.csv', 'Syn.csv', 'UDPLag.csv', 'DrDoS_UDP.csv']
+                 'DrDoS_NetBIOS.csv', 'DrDoS_LDAP.csv', 'DrDoS_NTP.csv', 'Syn.csv', 'UDPLag.csv', 'DrDoS_UDP.csv',
+                 'xLDAP.csv','xMSSQL.csv','xNetBIOS.csv','xPortmap.csv','xSyn.csv','xUDP.csv','xUDPLag.csv']
 
     print("************************************Loading Files******************************************")
     i = 0
