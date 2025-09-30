@@ -253,6 +253,13 @@ def create_pca_dataset(components=41):
     dataset = load_processed_dataset()
     encoder = LabelEncoder()
     dataset[' Label'] = encoder.fit_transform(dataset[' Label'])
+    # Persist label encoder classes so we can map numeric labels back to strings later
+    classes_path = os.path.join(os.getcwd(), 'Datasets', 'label_classes.npy')
+    try:
+        np.save(classes_path, encoder.classes_)
+    except Exception as e:
+        print(f"Warning: failed to save label classes to {classes_path}: {e}")
+    
     dataset1 = dataset.copy()
     dataset1.drop(' Label', axis=1, inplace=True)
 
