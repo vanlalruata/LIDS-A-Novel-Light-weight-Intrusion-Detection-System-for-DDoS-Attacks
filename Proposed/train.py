@@ -11,6 +11,15 @@ import sys
 from LIDS.eval_tools import accuracy, evaluate_proposed_model
 import warnings
 from torchviz import make_dot
+
+def _get_current_prefix(default: str = 'CICDDoS2019') -> str:
+    try:
+        path = os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt')
+        with open(path, 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            return s if s else default
+    except Exception:
+        return default
 #from torch.utils.tensorboard import SummaryWriter
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -135,7 +144,9 @@ def trainer(EPOCHS, BATCH_SIZE):
         train_val_metrics = {'Train Accuracy':epoch_train_acc ,'Train Loss':epoch_train_loss, 'Validation Accuracy':epoch_val_Acc , 'Validation Loss':epoch_val_loss}
         
         train_val_metrics = pd.DataFrame(train_val_metrics)
-        train_val_metrics.to_csv(os.getcwd()+'/Datasets/train_val_metrics.csv')
+        prefix = _get_current_prefix()
+        out_csv = os.path.join(os.getcwd(), 'Datasets', f'train_val_metrics_{prefix}.csv')
+        train_val_metrics.to_csv(out_csv)
        
         print('*************** Model Training Finished ************** ')
         print('*************** Testing Model on the Test Data ************** ')
@@ -279,7 +290,9 @@ def trainer_multi(EPOCHS, BATCH_SIZE):
         train_val_metrics = {'Train Accuracy':epoch_train_acc ,'Train Loss':epoch_train_loss, 'Validation Accuracy':epoch_val_Acc , 'Validation Loss':epoch_val_loss}
         
         train_val_metrics = pd.DataFrame(train_val_metrics)
-        train_val_metrics.to_csv(os.getcwd()+'/Datasets/train_val_metrics_multi.csv')
+        prefix = _get_current_prefix()
+        out_csv = os.path.join(os.getcwd(), 'Datasets', f'train_val_metrics_multi_{prefix}.csv')
+        train_val_metrics.to_csv(out_csv)
        
         print('*************** Model Training Finished ************** ')
         print('*************** Testing Model on the Test Data ************** ')

@@ -5,6 +5,15 @@ from pylab import *
 
 plt.rcParams["font.serif"] = "Times New Roman"
 
+def _get_current_prefix(default: str = 'CICDDoS2019') -> str:
+    try:
+        path = os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt')
+        with open(path, 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            return s if s else default
+    except Exception:
+        return default
+
 
 def class_distributions(dataset):
     items = dataset[' Label'].value_counts()
@@ -87,7 +96,8 @@ def class_distributions(dataset):
                         wspace=0.2149,
                         )
 
-    plt.savefig(os.getcwd() + '/Images/class_distribution.png', dpi=600)
+    prefix = _get_current_prefix()
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_class_distribution.png'), dpi=600)
 
 
 def pca_analysis(dataset, components=3):
@@ -190,11 +200,17 @@ def plot_files_preprocessing():
 
             index += 1
     plt.subplots_adjust(wspace=0, hspace=0.2)
-    plt.savefig(os.getcwd() + '/Images/files_distribution.png', dpi=600)
+    prefix = _get_current_prefix()
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_files_distribution.png'), dpi=600)
 
 
 def plot_proposed_model_accuracy_loss():
-    data = pd.read_csv(os.getcwd() + '/Datasets/train_val_metrics.csv')
+    prefix = _get_current_prefix()
+    metrics_path = os.path.join(os.getcwd(), 'Datasets', f'train_val_metrics_{prefix}.csv')
+    if not os.path.exists(metrics_path):
+        # Fallback to legacy name
+        metrics_path = os.path.join(os.getcwd(), 'Datasets', 'train_val_metrics.csv')
+    data = pd.read_csv(metrics_path)
 
     # Accuracy figure
     plt.figure(figsize=(8, 5))
@@ -204,7 +220,7 @@ def plot_proposed_model_accuracy_loss():
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.tight_layout()
-    plt.savefig(os.getcwd() + '/Images/proposed_model_accuracy.png', dpi=600)
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_accuracy.png'), dpi=600)
     plt.close()
 
     # Loss figure
@@ -215,12 +231,16 @@ def plot_proposed_model_accuracy_loss():
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.tight_layout()
-    plt.savefig(os.getcwd() + '/Images/proposed_model_loss.png', dpi=600)
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_loss.png'), dpi=600)
     plt.close()
 
 
 def plot_multi_proposed_model_accuracy_loss():
-    data = pd.read_csv(os.getcwd() + '/Datasets/train_val_metrics_multi.csv')
+    prefix = _get_current_prefix()
+    metrics_path = os.path.join(os.getcwd(), 'Datasets', f'train_val_metrics_multi_{prefix}.csv')
+    if not os.path.exists(metrics_path):
+        metrics_path = os.path.join(os.getcwd(), 'Datasets', 'train_val_metrics_multi.csv')
+    data = pd.read_csv(metrics_path)
 
     # Accuracy figure
     plt.figure(figsize=(8, 5))
@@ -230,7 +250,7 @@ def plot_multi_proposed_model_accuracy_loss():
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
     plt.tight_layout()
-    plt.savefig(os.getcwd() + '/Images/proposed_model_multi_accuracy.png', dpi=600)
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_multi_accuracy.png'), dpi=600)
     plt.close()
 
     # Loss figure
@@ -241,7 +261,7 @@ def plot_multi_proposed_model_accuracy_loss():
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.tight_layout()
-    plt.savefig(os.getcwd() + '/Images/proposed_model_multi_loss.png', dpi=600)
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_multi_loss.png'), dpi=600)
     plt.close()
 
 

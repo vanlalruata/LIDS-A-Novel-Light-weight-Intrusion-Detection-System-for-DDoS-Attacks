@@ -44,6 +44,65 @@ def weighted_random_sampler(train):
     return weighted_sampler
 
 
+def _prefix_for_choice(dataset_choice):
+    if dataset_choice == 2:
+        return 'BoT-IoT'
+    if dataset_choice == 3:
+        return 'TON_IoT'
+    return 'CICDDoS2019'
+
+
+def _prefix_state_path():
+    return os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt')
+
+
+def set_current_prefix(prefix: str):
+    try:
+        base = os.path.join(os.getcwd(), 'Datasets')
+        if not os.path.exists(base):
+            os.makedirs(base)
+        with open(_prefix_state_path(), 'w', encoding='utf-8') as f:
+            f.write(prefix.strip())
+    except Exception as e:
+        print(f'Warning: failed to persist current dataset prefix: {e}')
+
+
+def get_current_prefix(default: str = 'CICDDoS2019') -> str:
+    try:
+        with open(_prefix_state_path(), 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            return s if s else default
+    except Exception:
+        return default
+
+
+def print_dataset_summary(df: pd.DataFrame, name: str = ''):
+    try:
+        print('Columns:', list(df.columns))
+        n_rows, n_cols = df.shape
+        num_cols = [c for c in df.columns if c != ' Label' and pd.api.types.is_numeric_dtype(df[c])]
+        cat_cols = [c for c in df.columns if c != ' Label' and not pd.api.types.is_numeric_dtype(df[c])]
+        print(f"Dataset Summary{name and ' - ' + name}: rows={n_rows}, cols={n_cols}, numeric_features={len(num_cols)}, categorical_features={len(cat_cols)}")
+        if ' Label' in df.columns:
+            vc = df[' Label'].value_counts(dropna=False)
+            print('Label distribution:', vc.to_dict())
+            # class weights and average sample weight
+            total = float(vc.sum()) if len(vc) else 0.0
+            weights = {k: (0.0 if v == 0 else 1.0/float(v)) for k, v in vc.items()}
+            avg_w = (sum(weights.get(lbl, 0.0) for lbl in df[' Label'])/n_rows) if n_rows else 0.0
+            print('Class weights (1/count):', weights)
+            print('Average sample weight:', round(avg_w, 6))
+        # basic numeric means overview
+        numeric_means = df[num_cols].mean().to_dict() if num_cols else {}
+        if numeric_means:
+            # Print only first few means to keep concise
+            subset = dict(list(numeric_means.items())[:5])
+            print('Feature means (sample):', subset, '...')
+    except Exception as e:
+        print(f'Warning: failed to print dataset summary: {e}')
+
+
+
 def make_datasets(PATH, nrows, dataset_choice=1):
     """
     The function loads the processed dataset file and does
@@ -107,7 +166,11 @@ def make_datasets(PATH, nrows, dataset_choice=1):
     dataset = drop_less_information_gain_features(dataset)
     dataset = drop_qasi_constant_features(dataset)
 
-    dataset.to_csv(os.getcwd() + '/Datasets/Processed_Dataset.csv')
+    # Save processed dataset with dataset-specific prefix
+    prefix = _prefix_for_choice(dataset_choice)
+    set_current_prefix(prefix)
+    out_path = os.path.join(os.getcwd(), 'Datasets', f'Processed_{prefix}.csv')
+    dataset.to_csv(out_path)
 
     # print(mappings)
     print("Dataset Shape", dataset.shape)
@@ -204,7 +267,14 @@ def load_dataset_toniot(PATH, nrows):
         dataset = df if i == 0 else pd.concat([dataset, df], ignore_index=True)
         i += 1
     print('Concatenated shape:', dataset.shape)
+    # Drop unwanted TON_IoT columns if present
+    drop_cols = ['src_ip','src_port','dst_ip','dst_port','proto','service','http_user_agent','http_orig_mime_types','http_resp_mime_types','weird_name','weird_addl','weird_notice','dns_AA','dns_RD','dns_RA','dns_rejected','ssl_version','ssl_cipher','ssl_resumed','ssl_established','ssl_subject','ssl_issuer','http_trans_depth','http_method','http_uri','http_referrer','http_version','dns_query']
+    to_drop = [c for c in drop_cols if c in dataset.columns]
+    if to_drop:
+        print('Dropping TON_IoT columns:', to_drop)
+        dataset.drop(columns=to_drop, inplace=True)
     dataset = ensure_label_and_numeric(dataset, 3)
+    print_dataset_summary(dataset, name='TON_IoT (post-load)')
     print('TON_IoT dataset prepared. Shape:', dataset.shape)
     return dataset
 
@@ -331,12 +401,16 @@ def drop_less_information_gain_features(dataset, threshold=0.05):
 
 def load_processed_dataset():
     print("********************************* Loading Preprocessed dataset********************************")
-
-    PATH = os.getcwd() + '/Datasets/Processed_Dataset.csv'
+    prefix = get_current_prefix()
+    PATH = os.path.join(os.getcwd(), 'Datasets', f'Processed_{prefix}.csv')
+    if not os.path.exists(PATH):
+        # Fallback to legacy name
+        PATH = os.path.join(os.getcwd(), 'Datasets', 'Processed_Dataset.csv')
     dataset = pd.read_csv(PATH)
-    dataset.drop('Unnamed: 0', axis=1, inplace=True)
+    if 'Unnamed: 0' in dataset.columns:
+        dataset.drop('Unnamed: 0', axis=1, inplace=True)
 
-    print("************************************ Preprocessed dataset Loaded****************************")
+    print(f"************************************ Preprocessed dataset Loaded ({os.path.basename(PATH)}) ****************************")
 
     return dataset
 
@@ -344,10 +418,11 @@ def load_processed_dataset():
 def load_pca_dataset():
     print("********************************* Loading PCA dataset********************************")
 
-    base_path = os.getcwd() + '/Datasets/'
-    pca_path = os.path.join(base_path, 'PCA_Dataset.csv')
-    train_path = os.path.join(base_path, 'train_PCA_Dataset.csv')
-    test_path = os.path.join(base_path, 'test_PCA_Dataset.csv')
+    base_path = os.path.join(os.getcwd(), 'Datasets')
+    prefix = get_current_prefix()
+    pca_path = os.path.join(base_path, f'PCA_{prefix}.csv')
+    train_path = os.path.join(base_path, f'train_PCA_{prefix}.csv')
+    test_path = os.path.join(base_path, f'test_PCA_{prefix}.csv')
 
     dataset = None
     if os.path.exists(pca_path):
@@ -412,9 +487,11 @@ def create_pca_dataset(components=41):
     test_PCA[' Label'] = test_label
 
     print("****************************** PCA Datasets Created *******************************")
-    # principal_components.to_csv(os.getcwd()+'/Datasets/PCA_Dataset.csv')
-    train_PCA.to_csv(os.getcwd() + '/Datasets/train_PCA_Dataset.csv')
-    test_PCA.to_csv(os.getcwd() + '/Datasets/test_PCA_Dataset.csv')
+    prefix = get_current_prefix()
+    out_dir = os.path.join(os.getcwd(), 'Datasets')
+    # principal_components.to_csv(os.path.join(out_dir, f'PCA_{prefix}.csv'))  # optional full PCA
+    train_PCA.to_csv(os.path.join(out_dir, f'train_PCA_{prefix}.csv'))
+    test_PCA.to_csv(os.path.join(out_dir, f'test_PCA_{prefix}.csv'))
     print("****************************** Created PCA Datasets Saved *******************************")
 
 

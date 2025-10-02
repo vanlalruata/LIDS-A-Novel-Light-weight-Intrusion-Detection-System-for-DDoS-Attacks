@@ -41,7 +41,15 @@ def principal_component_varience():
     max_y1 = max(explained_variance_limited.iloc[:, 0])
     ax1.set(ylim=(0, max_y1 + max_y1 * .1))
     plt.tight_layout()
-    plt.savefig(os.getcwd() + '/Images/explained_varience_pca.png', dpi=600)
+    prefix = 'CICDDoS2019'
+    try:
+        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            if s:
+                prefix = s
+    except Exception:
+        pass
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_explained_varience_pca.png'), dpi=600)
     plt.close(fig1)
 
     # Plot 2: Cumulative explained variance (line chart)
@@ -53,7 +61,15 @@ def principal_component_varience():
     max_y2 = max(explained_variance_limited.iloc[:, 1])
     ax2.set(ylim=(0, max_y2 + max_y2 * .1))
     plt.tight_layout()
-    plt.savefig(os.getcwd() + '/Images/cumulative_explained_varience_pca.png', dpi=600)
+    prefix = 'CICDDoS2019'
+    try:
+        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            if s:
+                prefix = s
+    except Exception:
+        pass
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_cumulative_explained_varience_pca.png'), dpi=600)
     plt.close(fig2)
 
     print("******************************PCA Done*******************************")
@@ -123,4 +139,12 @@ def plot_pca_analysis(dataset):
                         wspace=0.1,
                         )
 
-    plt.savefig(os.getcwd() + '/Images/pca_analysis.png', dpi=600)
+    prefix = 'CICDDoS2019'
+    try:
+        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            if s:
+                prefix = s
+    except Exception:
+        pass
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_pca_analysis.png'), dpi=600)
