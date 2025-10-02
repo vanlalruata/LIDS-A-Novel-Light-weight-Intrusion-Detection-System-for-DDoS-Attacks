@@ -498,27 +498,43 @@ def create_pca_dataset(components=41):
 def drop_qasi_constant_features(dataset):
     print("************************************ Dropping Qasi Constant Features ****************************")
 
-    dataset1 = dataset.copy()
-    VarianceThreshold
-    dataset1.drop(' Label', axis=1, inplace=True)
-    import pdb
+    # Work on a copy without the label and only keep numeric columns
+    df = dataset.copy()
+    if ' Label' not in df.columns:
+        print("Warning: ' Label' not found while dropping quasi-constant features; skipping step.")
+        return dataset
 
-    qasi_constant_filter = VarianceThreshold(threshold=0.01)
+    df_features = df.drop(columns=[' Label'])
+    numeric_cols = [c for c in df_features.columns if pd.api.types.is_numeric_dtype(df_features[c])]
+    if not numeric_cols:
+        print("No numeric feature columns available for variance threshold. Skipping this step.")
+        return dataset
 
-    qasi_constant_filter.fit(dataset1)
+    X = df_features[numeric_cols]
+    # If X has zero columns or rows, skip safely
+    if X.shape[1] == 0 or X.shape[0] == 0:
+        print("Empty feature matrix encountered. Skipping variance threshold.")
+        return dataset
 
-    qasi_support = qasi_constant_filter.get_support()
+    # Apply VarianceThreshold to identify low-variance features
+    vt = VarianceThreshold(threshold=0.01)
+    try:
+        vt.fit(X)
+    except Exception as e:
+        print(f"VarianceThreshold.fit failed: {e}. Skipping this step.")
+        return dataset
 
-    qasi_constant_features = []
-    features = dataset1.columns
-    for i in range(len(qasi_support)):
-        if qasi_support[i] == True:
-            qasi_constant_features.append(features[i])
+    support = vt.get_support()
+    # True = keep, False = drop. We want to drop low-variance features (False)
+    to_drop = [col for col, keep in zip(numeric_cols, support) if not keep]
 
-    for i in range(len(qasi_constant_features)):
-        print("{}. {}".format(i + 1, qasi_constant_features[i]))
-
-    dataset.drop(qasi_constant_features, axis=1, inplace=True)
+    if to_drop:
+        print("Dropping quasi-constant features (low variance):")
+        for i, col in enumerate(to_drop, start=1):
+            print(f"{i}. {col}")
+        dataset.drop(columns=to_drop, inplace=True, errors='ignore')
+    else:
+        print("No quasi-constant features detected.")
 
     print("************************************ Dropped Qasi Constant Features ****************************")
 
