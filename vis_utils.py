@@ -143,7 +143,7 @@ def plot_files_preprocessing():
     nan deletion, drop duplicates and meaningless col deletion
     """
     filenames = ['TFTP', 'DrDoS SNMP', 'DrDoS DNS', 'DrDoS MSSQL', 'DrDoS SSDP',
-                 'DrDoS NetBIOS', 'DrDoS LDAP', 'DrDoS NTP', 'Syn', 'UDPLag', 'DrDoS UDP', ' ']
+                 'DrDoS NetBIOS', 'DrDoS LDAP', 'DrDoS NTP', 'Syn', 'UDPLag', 'DrDoS UDP']
 
     # The values are got after the final file was created and the sizes were recorded
     original_size = [20107827, 5161377, 5074413, 4524498, 2611374, 4094986,
