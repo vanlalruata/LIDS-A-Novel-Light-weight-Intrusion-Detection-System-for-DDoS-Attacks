@@ -44,7 +44,7 @@ def weighted_random_sampler(train):
     return weighted_sampler
 
 
-def make_datasets(PATH, nrows):
+def make_datasets(PATH, nrows, dataset_choice=1):
     """
     The function loads the processed dataset file and does
     1. inf records are deleted
@@ -58,12 +58,44 @@ def make_datasets(PATH, nrows):
     
     """
 
-    dataset = load_dataset(PATH, nrows)
+    # Load dataset based on user choice: 1=CICIDS2018/CIC-like (comma), 2=BoT-IoT (semicolon), 3=TON_IoT (comma)
+    if dataset_choice == 2:
+        dataset = load_dataset_botiot(PATH, nrows)
+    elif dataset_choice == 3:
+        dataset = load_dataset_toniot(PATH, nrows)
+    else:
+        dataset = load_dataset(PATH, nrows)
 
     dataset = dataset.replace([np.inf, -np.inf], np.nan)
 
-    dataset.dropna(axis=0, inplace=True)
-    print('Drop na ', dataset.shape)
+    # Handle missing values more robustly: fill feature NaNs, only drop rows with missing labels
+    # Identify label column
+    lbl_col = ' Label' if ' Label' in dataset.columns else None
+    for c in ['attack', 'label']:
+        if lbl_col is None and c in dataset.columns:
+            lbl_col = c
+    if lbl_col is None:
+        raise ValueError("Label column not found after loading. Expected one of [' Label','attack','label'].")
+
+    # Standardize to ' Label' if not already
+    if lbl_col != ' Label':
+        dataset[' Label'] = dataset[lbl_col]
+        if lbl_col in dataset.columns:
+            dataset.drop(lbl_col, axis=1, inplace=True)
+        lbl_col = ' Label'
+
+    # Replace empty strings with NaN then fill feature NaNs with 0
+    dataset.replace('', np.nan, inplace=True)
+    feature_cols = [c for c in dataset.columns if c != lbl_col]
+    if feature_cols:
+        dataset[feature_cols] = dataset[feature_cols].fillna(0)
+
+    # Drop rows with missing label only
+    before_rows = len(dataset)
+    dataset = dataset[dataset[lbl_col].notna()]
+    dataset.reset_index(drop=True, inplace=True)
+    print(f"After filling features and dropping missing labels: {dataset.shape} (dropped {before_rows - len(dataset)} rows)")
+
     dataset = drop_constant_features(dataset)
     dataset = drop_duplicate_features(dataset)
     print("Dataset Shape:", dataset.shape)
@@ -80,6 +112,101 @@ def make_datasets(PATH, nrows):
     # print(mappings)
     print("Dataset Shape", dataset.shape)
     print("********************************* Dataset Created*****************************************")
+
+
+def ensure_label_and_numeric(dataset, dataset_choice):
+    # Standardize label column to ' Label' and convert features to numeric
+    label_col = None
+    if ' Label' in dataset.columns:
+        label_col = ' Label'
+    elif 'attack' in dataset.columns:
+        dataset[' Label'] = dataset['attack'].astype(int)
+        label_col = ' Label'
+    elif 'label' in dataset.columns:
+        dataset[' Label'] = dataset['label'].astype(int)
+        label_col = ' Label'
+    elif 'Category' in dataset.columns:
+        # Map any non-BENIGN to 1
+        dataset[' Label'] = dataset['Category'].apply(lambda x: 0 if str(x).upper() == 'BENIGN' else 1)
+        label_col = ' Label'
+    else:
+        raise ValueError('Unable to identify label column for the selected dataset.')
+
+    # Drop original label-like columns other than the standardized one
+    for c in ['attack', 'label']:
+        if c in dataset.columns:
+            dataset.drop(c, axis=1, inplace=True)
+
+    # Convert non-numeric feature columns to numeric via label encoding
+    from sklearn.preprocessing import LabelEncoder
+    le = LabelEncoder()
+    for col in list(dataset.columns):
+        if col == ' Label':
+            continue
+        if dataset[col].dtype == 'object':
+            # Normalize blanks to NaN for consistent handling
+            series = dataset[col]
+            series = series.replace('', np.nan)
+            try:
+                coerced = pd.to_numeric(series)
+                dataset[col] = coerced
+            except Exception:
+                dataset[col] = le.fit_transform(series.astype(str).fillna('NA'))
+    return dataset
+
+
+def load_dataset_botiot(PATH, nrows):
+    # Loop all CSV files in folder with semicolon delimiter
+    print('Loading BoT-IoT dataset from folder: ', PATH)
+    filenames = get_file_names(PATH)
+    csvs = [f for f in filenames if f.lower().endswith('.csv')]
+    if not csvs:
+        raise FileNotFoundError('No CSV files found in the provided BoT-IoT folder.')
+    i = 0
+    dataset = None
+    for fname in csvs:
+        fullp = os.path.join(PATH, fname)
+        print('Reading:', fullp)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            try:
+                df = pd.read_csv(fullp, sep=';', quotechar='"', engine='python', on_bad_lines='skip', nrows=nrows)
+            except TypeError:
+                # Fallback for older pandas
+                df = pd.read_csv(fullp, sep=';', quotechar='"', engine='python', error_bad_lines=False, nrows=nrows)
+        df.dropna(axis=0, how='all', inplace=True)
+        df.drop_duplicates(inplace=True)
+        dataset = df if i == 0 else pd.concat([dataset, df], ignore_index=True)
+        i += 1
+    print('Concatenated shape:', dataset.shape)
+    dataset = ensure_label_and_numeric(dataset, 2)
+    print('BoT-IoT dataset prepared. Shape:', dataset.shape)
+    return dataset
+
+
+def load_dataset_toniot(PATH, nrows):
+    # Loop all CSV files in folder with comma delimiter
+    print('Loading TON_IoT dataset from folder: ', PATH)
+    filenames = get_file_names(PATH)
+    csvs = [f for f in filenames if f.lower().endswith('.csv')]
+    if not csvs:
+        raise FileNotFoundError('No CSV files found in the provided TON_IoT folder.')
+    i = 0
+    dataset = None
+    for fname in csvs:
+        fullp = os.path.join(PATH, fname)
+        print('Reading:', fullp)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            df = pd.read_csv(fullp, sep=',', engine='python', on_bad_lines='skip', nrows=nrows)
+        df.dropna(axis=0, how='all', inplace=True)
+        df.drop_duplicates(inplace=True)
+        dataset = df if i == 0 else pd.concat([dataset, df], ignore_index=True)
+        i += 1
+    print('Concatenated shape:', dataset.shape)
+    dataset = ensure_label_and_numeric(dataset, 3)
+    print('TON_IoT dataset prepared. Shape:', dataset.shape)
+    return dataset
 
 
 def load_dataset(PATH, nrows):

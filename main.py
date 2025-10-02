@@ -3,7 +3,7 @@ import os
 EPOCHS = 100
 BATCH_SIZE = 1024
 PATH = 'H:/Datasets/CIC-DDoS2019/01-12'
-n_rows = 50000
+n_rows = 500000
 
 if __name__ == '__main__':
 
@@ -19,7 +19,23 @@ if __name__ == '__main__':
 
     if selection == 1:
         from Proposed.data_utils import make_datasets
-        make_datasets(PATH, n_rows)
+        print('Select dataset:')
+        print('1. CICDDoS2019/CIC-like (comma-delimited)')
+        print('2. BoT-IoT (semicolon-delimited; folder of CSVs)')
+        print('3. TON_IoT (comma-delimited; folder of CSVs)')
+        dataset_choice = int(input('Enter dataset number (1/2/3): '))
+
+        if dataset_choice == 1:
+            dataset_path = 'H:/Datasets/CIC-DDoS2019/01-12'
+        elif dataset_choice == 2:
+            dataset_path = 'H:/Datasets/BoT-IoT'
+        elif dataset_choice == 3:
+            dataset_path = 'H:/Datasets/TON_IoT/Processed_datasets/Processed_Network_dataset'
+        else:
+            dataset_path = PATH
+
+        use_path = dataset_path if dataset_path else PATH
+        make_datasets(use_path, n_rows, dataset_choice)
 
     elif selection == 2:
         from Proposed.data_utils import create_pca_dataset
