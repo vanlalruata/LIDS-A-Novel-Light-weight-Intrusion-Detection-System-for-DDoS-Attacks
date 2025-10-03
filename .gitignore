@@ -20,6 +20,8 @@ parts/
 sdist/
 var/
 /Datasets/
+PretrainedModel/
+PretrainedModelMulti/
 wheels/
 share/python-wheels/
 *.egg-info/
