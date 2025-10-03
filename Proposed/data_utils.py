@@ -1,7 +1,6 @@
 from LIDS.data_utils import get_file_names, drop_meaningless_cols, drop_constant_features, min_max_scaler
 from sklearn.preprocessing import LabelEncoder
 from info_gain import info_gain
-from LIDS.data_utils import min_max_scaler
 from sklearn.feature_selection import VarianceThreshold
 import warnings
 import numpy as np
@@ -220,16 +219,21 @@ def ensure_label_and_numeric(dataset, dataset_choice):
 
 def load_dataset_botiot(PATH, nrows):
     # Loop all CSV files in folder with semicolon delimiter
+    print("************************************Loading Files******************************************")
     print('Loading BoT-IoT dataset from folder: ', PATH)
     filenames = get_file_names(PATH)
     csvs = [f for f in filenames if f.lower().endswith('.csv')]
     if not csvs:
         raise FileNotFoundError('No CSV files found in the provided BoT-IoT folder.')
+    
     i = 0
     dataset = None
     for fname in csvs:
+        print('*****************************************************************************************')
+        print('*****************************************************************************************')
+        print('File to Load: ', fname)
+        
         fullp = os.path.join(PATH, fname)
-        print('Reading:', fullp)
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             try:
@@ -237,45 +241,89 @@ def load_dataset_botiot(PATH, nrows):
             except TypeError:
                 # Fallback for older pandas
                 df = pd.read_csv(fullp, sep=';', quotechar='"', engine='python', error_bad_lines=False, nrows=nrows)
+        
+        print("*****************Original File Shape******************")
+        print(df.shape)
+        
         df.dropna(axis=0, how='all', inplace=True)
         df.drop_duplicates(inplace=True)
-        dataset = df if i == 0 else pd.concat([dataset, df], ignore_index=True)
+        print("After null and duplicate:", df.shape)
+        
+        if i == 0:
+            dataset = df
+        else:
+            dataset = pd.concat([dataset, df], ignore_index=True)
+            print("############After Concatenation Dataset Shape##############")
+            print(dataset.shape)
+            dataset.drop_duplicates(inplace=True)
+            print('After duplicate Removal:', dataset.shape)
+            del df
+        
         i += 1
-    print('Concatenated shape:', dataset.shape)
+    
+    print("***************After loading all files Dataset Shape***********:")
+    print(dataset.shape)
+    print("************************************ Files Loaded ******************************************")
+    
     dataset = ensure_label_and_numeric(dataset, 2)
-    print('BoT-IoT dataset prepared. Shape:', dataset.shape)
+    print('BoT-IoT dataset prepared. Final Shape:', dataset.shape)
     return dataset
 
 
 def load_dataset_toniot(PATH, nrows):
     # Loop all CSV files in folder with comma delimiter
+    print("************************************Loading Files******************************************")
     print('Loading TON_IoT dataset from folder: ', PATH)
     filenames = get_file_names(PATH)
     csvs = [f for f in filenames if f.lower().endswith('.csv')]
     if not csvs:
         raise FileNotFoundError('No CSV files found in the provided TON_IoT folder.')
+    
     i = 0
     dataset = None
     for fname in csvs:
+        print('*****************************************************************************************')
+        print('*****************************************************************************************')
+        print('File to Load: ', fname)
+        
         fullp = os.path.join(PATH, fname)
-        print('Reading:', fullp)
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             df = pd.read_csv(fullp, sep=',', engine='python', on_bad_lines='skip', nrows=nrows)
+        
+        print("*****************Original File Shape******************")
+        print(df.shape)
+        
         df.dropna(axis=0, how='all', inplace=True)
         df.drop_duplicates(inplace=True)
-        dataset = df if i == 0 else pd.concat([dataset, df], ignore_index=True)
+        print("After null and duplicate:", df.shape)
+        
+        if i == 0:
+            dataset = df
+        else:
+            dataset = pd.concat([dataset, df], ignore_index=True)
+            print("############After Concatenation Dataset Shape##############")
+            print(dataset.shape)
+            dataset.drop_duplicates(inplace=True)
+            print('After duplicate Removal:', dataset.shape)
+            del df
+        
         i += 1
-    print('Concatenated shape:', dataset.shape)
+    
+    print("***************After loading all files Dataset Shape***********:")
+    print(dataset.shape)
+    print("************************************ Files Loaded ******************************************")
+    
     # Drop unwanted TON_IoT columns if present
     drop_cols = ['src_ip','src_port','dst_ip','dst_port','proto','service','http_user_agent','http_orig_mime_types','http_resp_mime_types','weird_name','weird_addl','weird_notice','dns_AA','dns_RD','dns_RA','dns_rejected','ssl_version','ssl_cipher','ssl_resumed','ssl_established','ssl_subject','ssl_issuer','http_trans_depth','http_method','http_uri','http_referrer','http_version','dns_query']
     to_drop = [c for c in drop_cols if c in dataset.columns]
     if to_drop:
         print('Dropping TON_IoT columns:', to_drop)
         dataset.drop(columns=to_drop, inplace=True)
+    
     dataset = ensure_label_and_numeric(dataset, 3)
     print_dataset_summary(dataset, name='TON_IoT (post-load)')
-    print('TON_IoT dataset prepared. Shape:', dataset.shape)
+    print('TON_IoT dataset prepared. Final Shape:', dataset.shape)
     return dataset
 
 
@@ -330,7 +378,7 @@ def load_dataset(PATH, nrows):
                 print("After null and duplicate:", df1.shape)
 
                 dataset = pd.concat([dataset, df1])
-                print("############After Concnation Dataset Shape############## ")
+                print("############After Concatenation Dataset Shape############## ")
                 print(dataset.shape)
                 dataset.drop_duplicates(inplace=True)
 

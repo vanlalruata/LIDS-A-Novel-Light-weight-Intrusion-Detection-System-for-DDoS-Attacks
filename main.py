@@ -1,4 +1,15 @@
 import os
+import sys
+
+# Ensure the parent directory is in the path for proper imports
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
+
+# Change to LIDS directory if not already there
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if os.getcwd() != script_dir:
+    os.chdir(script_dir)
 
 EPOCHS = 100
 BATCH_SIZE = 1024
