@@ -37,7 +37,12 @@ def trainer(EPOCHS, BATCH_SIZE):
     
     train_loader, validation_loader, test_loader = dataset_loader(BATCH_SIZE)
     
-    model = LCNNModel().to(device)
+    # Get the number of features from the first batch
+    sample_batch = next(iter(train_loader))
+    n_features = sample_batch[0].shape[1]
+    print(f"Detected {n_features} PCA features in the dataset")
+    
+    model = LCNNModel(n_features=n_features).to(device)
     '''
     #Plotting Model
     batch = next(iter(train_loader))
@@ -192,7 +197,12 @@ def trainer_multi(EPOCHS, BATCH_SIZE):
     
     train_loader, validation_loader, test_loader = dataset_loader_multi(BATCH_SIZE)
     
-    model = LCNNModelMulti()
+    # Get the number of features from the first batch
+    sample_batch = next(iter(train_loader))
+    n_features = sample_batch[0].shape[1]
+    print(f"Detected {n_features} PCA features in the dataset")
+    
+    model = LCNNModelMulti(n_features=n_features)
     
     model = model.to(device)
     

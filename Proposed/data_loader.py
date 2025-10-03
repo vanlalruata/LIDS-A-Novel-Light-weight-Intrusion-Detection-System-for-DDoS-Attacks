@@ -1,5 +1,5 @@
 from torch.utils.data import Dataset
-from LIDS.Proposed.data_utils import weighted_random_sampler
+from LIDS.Proposed.data_utils import weighted_random_sampler, get_current_prefix
 from torch.utils.data import DataLoader
 from torch.utils.data import random_split
 
@@ -15,9 +15,14 @@ import numpy as np
 class CIC2019(Dataset):
     
     def __init__(self, kind='train', n_features=10):
+        prefix = get_current_prefix()
         if kind=='train':
             print("******************** Loading Train PCA Dataset **********************")
-            xy = pd.read_csv(os.getcwd()+'/Datasets/train_PCA_Dataset.csv')
+            train_path = os.path.join(os.getcwd(), 'Datasets', f'train_PCA_{prefix}.csv')
+            # Fallback to legacy name if prefix-specific file doesn't exist
+            if not os.path.exists(train_path):
+                train_path = os.path.join(os.getcwd(), 'Datasets', 'train_PCA_Dataset.csv')
+            xy = pd.read_csv(train_path)
             # Ensure binary labels 0/1, even if numeric multiclass ids are present
             if xy[' Label'].dtype == object:
                 xy[' Label'] = xy[' Label'].apply(map_binary_class_attack)
@@ -34,8 +39,11 @@ class CIC2019(Dataset):
     
         else:
             print("******************** Loading Test PCA Dataset **********************")
-
-            xy = pd.read_csv(os.getcwd()+'/Datasets/test_PCA_Dataset.csv')
+            test_path = os.path.join(os.getcwd(), 'Datasets', f'test_PCA_{prefix}.csv')
+            # Fallback to legacy name if prefix-specific file doesn't exist
+            if not os.path.exists(test_path):
+                test_path = os.path.join(os.getcwd(), 'Datasets', 'test_PCA_Dataset.csv')
+            xy = pd.read_csv(test_path)
             # Ensure binary labels 0/1, even if numeric multiclass ids are present
             if xy[' Label'].dtype == object:
                 xy[' Label'] = xy[' Label'].apply(map_binary_class_attack)
@@ -50,10 +58,17 @@ class CIC2019(Dataset):
         
             print("******************** Train PCA Dataset Loaded **********************")
        
-        features = []
-        for i in range(n_features):
-            features.append('PC '+ str(i+1))
+        # Dynamically detect available PCA components
+        available_pcs = [col for col in xy.columns if col.startswith('PC ')]
         
+        # Use the minimum of requested features or available features
+        if len(available_pcs) < n_features:
+            print(f"Warning: Requested {n_features} features but only {len(available_pcs)} available. Using {len(available_pcs)} features.")
+            features = available_pcs
+        else:
+            features = []
+            for i in range(n_features):
+                features.append('PC '+ str(i+1))
         
         xy = xy[features]
         
@@ -76,9 +91,14 @@ class CIC2019(Dataset):
 class CIC2019Multi(Dataset):
     
     def __init__(self, kind='train', n_features=10):
+        prefix = get_current_prefix()
         if kind=='train':
             print("******************** Loading Train PCA Dataset **********************")
-            xy = pd.read_csv(os.getcwd()+'/Datasets/train_PCA_Dataset.csv')    
+            train_path = os.path.join(os.getcwd(), 'Datasets', f'train_PCA_{prefix}.csv')
+            # Fallback to legacy name if prefix-specific file doesn't exist
+            if not os.path.exists(train_path):
+                train_path = os.path.join(os.getcwd(), 'Datasets', 'train_PCA_Dataset.csv')
+            xy = pd.read_csv(train_path)
             # Map labels only if they are strings; if already numeric, keep as-is
             if xy[' Label'].dtype == object:
                 xy[' Label'] = xy[' Label'].apply(map_multi_class_attack)
@@ -90,8 +110,11 @@ class CIC2019Multi(Dataset):
     
         else:
             print("******************** Loading Test PCA Dataset **********************")
-
-            xy = pd.read_csv(os.getcwd()+'/Datasets/test_PCA_Dataset.csv')
+            test_path = os.path.join(os.getcwd(), 'Datasets', f'test_PCA_{prefix}.csv')
+            # Fallback to legacy name if prefix-specific file doesn't exist
+            if not os.path.exists(test_path):
+                test_path = os.path.join(os.getcwd(), 'Datasets', 'test_PCA_Dataset.csv')
+            xy = pd.read_csv(test_path)
             if xy[' Label'].dtype == object:
                 xy[' Label'] = xy[' Label'].apply(map_multi_class_attack)
             
@@ -101,10 +124,17 @@ class CIC2019Multi(Dataset):
         
             print("******************** Train PCA Dataset Loaded **********************")
        
-        features = []
-        for i in range(n_features):
-            features.append('PC '+ str(i+1))
+        # Dynamically detect available PCA components
+        available_pcs = [col for col in xy.columns if col.startswith('PC ')]
         
+        # Use the minimum of requested features or available features
+        if len(available_pcs) < n_features:
+            print(f"Warning: Requested {n_features} features but only {len(available_pcs)} available. Using {len(available_pcs)} features.")
+            features = available_pcs
+        else:
+            features = []
+            for i in range(n_features):
+                features.append('PC '+ str(i+1))
         
         xy = xy[features]
         

@@ -44,9 +44,11 @@ def weighted_random_sampler(train):
 
 
 def _prefix_for_choice(dataset_choice):
-    if dataset_choice == 2:
+    if dataset_choice == 1:
+        return 'CICDDoS2019'
+    elif dataset_choice == 2:
         return 'BoT-IoT'
-    if dataset_choice == 3:
+    elif dataset_choice == 3:
         return 'TON_IoT'
     return 'CICDDoS2019'
 
@@ -116,7 +118,7 @@ def make_datasets(PATH, nrows, dataset_choice=1):
     
     """
 
-    # Load dataset based on user choice: 1=CICIDS2018/CIC-like (comma), 2=BoT-IoT (semicolon), 3=TON_IoT (comma)
+    # Load dataset based on user choice: 1=CICDDoS2019 (comma), 2=BoT-IoT (semicolon), 3=TON_IoT (comma)
     if dataset_choice == 2:
         dataset = load_dataset_botiot(PATH, nrows)
     elif dataset_choice == 3:
