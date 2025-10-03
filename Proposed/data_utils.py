@@ -183,11 +183,16 @@ def ensure_label_and_numeric(dataset, dataset_choice):
     label_col = None
     if ' Label' in dataset.columns:
         label_col = ' Label'
+        print(f"Using existing ' Label' column. Unique values: {dataset[' Label'].unique()}")
     elif 'attack' in dataset.columns:
         dataset[' Label'] = dataset['attack'].astype(int)
         label_col = ' Label'
     elif 'label' in dataset.columns:
         dataset[' Label'] = dataset['label'].astype(int)
+        label_col = ' Label'
+    elif 'type' in dataset.columns:
+        # For TON_IoT, 'type' column should already be copied to ' Label'
+        dataset[' Label'] = dataset['type']
         label_col = ' Label'
     elif 'Category' in dataset.columns:
         # Map any non-BENIGN to 1
@@ -197,8 +202,8 @@ def ensure_label_and_numeric(dataset, dataset_choice):
         raise ValueError('Unable to identify label column for the selected dataset.')
 
     # Drop original label-like columns other than the standardized one
-    for c in ['attack', 'label']:
-        if c in dataset.columns:
+    for c in ['attack', 'label', 'type', 'Category']:
+        if c in dataset.columns and c != ' Label':
             dataset.drop(c, axis=1, inplace=True)
 
     # Convert non-numeric feature columns to numeric via label encoding
@@ -244,7 +249,7 @@ def load_dataset_botiot(PATH, nrows):
                 # Fallback for older pandas
                 df = pd.read_csv(fullp, sep=';', quotechar='"', engine='python', error_bad_lines=False, nrows=nrows)
         
-        print("*****************Original File Shape******************")
+        print("***************** Original File Shape ******************")
         print(df.shape)
         
         df.dropna(axis=0, how='all', inplace=True)
@@ -255,7 +260,7 @@ def load_dataset_botiot(PATH, nrows):
             dataset = df
         else:
             dataset = pd.concat([dataset, df], ignore_index=True)
-            print("############After Concatenation Dataset Shape##############")
+            print("############ After Concatenation Dataset Shape ##############")
             print(dataset.shape)
             dataset.drop_duplicates(inplace=True)
             print('After duplicate Removal:', dataset.shape)
@@ -266,6 +271,14 @@ def load_dataset_botiot(PATH, nrows):
     print("***************After loading all files Dataset Shape***********:")
     print(dataset.shape)
     print("************************************ Files Loaded ******************************************")
+    
+    # Drop BoT-IoT specific columns
+    drop_cols = ['record', 'flgs', 'proto', 'saddr', 'sport', 'dir', 'daddr', 'dport',
+                 'state', 'srcid', 'soui', 'doui', 'sco', 'dco', 'attack', 'category', 'subcategory']
+    to_drop = [c for c in drop_cols if c in dataset.columns]
+    if to_drop:
+        print(f'Dropping BoT-IoT columns: {to_drop}')
+        dataset.drop(columns=to_drop, inplace=True)
     
     dataset = ensure_label_and_numeric(dataset, 2)
     print('BoT-IoT dataset prepared. Final Shape:', dataset.shape)
@@ -296,6 +309,19 @@ def load_dataset_toniot(PATH, nrows):
         print("*****************Original File Shape******************")
         print(df.shape)
         
+        # For TON_IoT: Use 'type' column as ' Label' and drop 'label' column
+        if 'type' in df.columns:
+            print("Using 'type' column as ' Label' for TON_IoT dataset")
+            df[' Label'] = df['type']
+            print(f"Unique labels in 'type': {df[' Label'].unique()}")
+            # Drop the 'label' column if it exists
+            if 'label' in df.columns:
+                df.drop('label', axis=1, inplace=True)
+                print("Dropped 'label' column")
+            # Drop the original 'type' column after copying to ' Label'
+            if 'type' in df.columns:
+                df.drop('type', axis=1, inplace=True)
+        
         df.dropna(axis=0, how='all', inplace=True)
         df.drop_duplicates(inplace=True)
         print("After null and duplicate:", df.shape)
@@ -316,8 +342,8 @@ def load_dataset_toniot(PATH, nrows):
     print(dataset.shape)
     print("************************************ Files Loaded ******************************************")
     
-    # Drop unwanted TON_IoT columns if present
-    drop_cols = ['src_ip','src_port','dst_ip','dst_port','proto','service','http_user_agent','http_orig_mime_types','http_resp_mime_types','weird_name','weird_addl','weird_notice','dns_AA','dns_RD','dns_RA','dns_rejected','ssl_version','ssl_cipher','ssl_resumed','ssl_established','ssl_subject','ssl_issuer','http_trans_depth','http_method','http_uri','http_referrer','http_version','dns_query']
+    # Drop unwanted TON_IoT columns if present (including 'label' and 'ts')
+    drop_cols = ['ts', 'src_ip','src_port','dst_ip','dst_port','proto','service','http_user_agent','http_orig_mime_types','http_resp_mime_types','weird_name','weird_addl','weird_notice','dns_AA','dns_RD','dns_RA','dns_rejected','ssl_version','ssl_cipher','ssl_resumed','ssl_established','ssl_subject','ssl_issuer','http_trans_depth','http_method','http_uri','http_referrer','http_version','dns_query', 'label']
     to_drop = [c for c in drop_cols if c in dataset.columns]
     if to_drop:
         print('Dropping TON_IoT columns:', to_drop)
