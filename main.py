@@ -14,7 +14,7 @@ if os.getcwd() != script_dir:
 EPOCHS = 100
 BATCH_SIZE = 1024
 PATH = 'H:/Datasets/CIC-DDoS2019/01-12'
-n_rows = 500000
+n_rows = 5000000
 
 if __name__ == '__main__':
 
@@ -77,5 +77,10 @@ if __name__ == '__main__':
         trainer_multi(EPOCHS, BATCH_SIZE)
 
     elif selection == 6:
-        from vis_utils import plot_proposed_model_accuracy_loss
+        from vis_utils import plot_proposed_model_accuracy_loss, plot_multi_proposed_model_accuracy_loss
+        print("Plotting training results...")
+        print("1. Plotting Binary Classification Results")
         plot_proposed_model_accuracy_loss()
+        print("2. Plotting Multiclass Classification Results")
+        plot_multi_proposed_model_accuracy_loss()
+        print("Plotting completed!")

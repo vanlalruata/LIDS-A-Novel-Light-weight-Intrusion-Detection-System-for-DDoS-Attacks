@@ -141,7 +141,17 @@ def plot_files_preprocessing():
     """
     Plots pie charts of the individual files describing the amount of data deleted after
     nan deletion, drop duplicates and meaningless col deletion
+    Note: This function is specific to CICDDoS2019 dataset with hardcoded file statistics.
     """
+    prefix = _get_current_prefix()
+    
+    # Check if current dataset is CICDDoS2019
+    if prefix != 'CICDDoS2019':
+        print(f"Warning: plot_files_preprocessing() is designed for CICDDoS2019 dataset.")
+        print(f"Current dataset: {prefix}")
+        print("Skipping file preprocessing visualization for this dataset.")
+        return
+    
     filenames = ['TFTP', 'DrDoS SNMP', 'DrDoS DNS', 'DrDoS MSSQL', 'DrDoS SSDP',
                  'DrDoS NetBIOS', 'DrDoS LDAP', 'DrDoS NTP', 'Syn', 'UDPLag', 'DrDoS UDP']
 
@@ -200,8 +210,8 @@ def plot_files_preprocessing():
 
             index += 1
     plt.subplots_adjust(wspace=0, hspace=0.2)
-    prefix = _get_current_prefix()
     plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_files_distribution.png'), dpi=600)
+    print(f"Saved file preprocessing plot to Images/{prefix}_files_distribution.png")
 
 
 def plot_proposed_model_accuracy_loss():
@@ -210,6 +220,12 @@ def plot_proposed_model_accuracy_loss():
     if not os.path.exists(metrics_path):
         # Fallback to legacy name
         metrics_path = os.path.join(os.getcwd(), 'Datasets', 'train_val_metrics.csv')
+    
+    if not os.path.exists(metrics_path):
+        print(f"Error: Training metrics file not found at {metrics_path}")
+        print("Please run option 4 (Binary Classification Training) first to generate the metrics file.")
+        return
+    
     data = pd.read_csv(metrics_path)
 
     # Accuracy figure
@@ -240,6 +256,12 @@ def plot_multi_proposed_model_accuracy_loss():
     metrics_path = os.path.join(os.getcwd(), 'Datasets', f'train_val_metrics_multi_{prefix}.csv')
     if not os.path.exists(metrics_path):
         metrics_path = os.path.join(os.getcwd(), 'Datasets', 'train_val_metrics_multi.csv')
+    
+    if not os.path.exists(metrics_path):
+        print(f"Error: Training metrics file not found at {metrics_path}")
+        print("Please run option 5 (Multiclass Classification Training) first to generate the metrics file.")
+        return
+    
     data = pd.read_csv(metrics_path)
 
     # Accuracy figure
@@ -265,4 +287,5 @@ def plot_multi_proposed_model_accuracy_loss():
     plt.close()
 
 
-plot_multi_proposed_model_accuracy_loss()
+# Removed auto-execution - this should only run when called from main.py
+# plot_multi_proposed_model_accuracy_loss()
