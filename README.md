@@ -1,7 +1,7 @@
 # LIDS
 
 ```aiignore
-cd LIDS
+cd LIDS*
 pip install -r requirements.txt
 python main.py
 ```
