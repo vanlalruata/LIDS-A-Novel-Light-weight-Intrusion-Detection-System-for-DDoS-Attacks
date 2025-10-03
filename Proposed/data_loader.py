@@ -9,9 +9,6 @@ import os
 import numpy as np
 
 
-
-
-
 class CIC2019(Dataset):
     
     def __init__(self, kind='train', n_features=10):
@@ -85,9 +82,7 @@ class CIC2019(Dataset):
         
         return self.samples[index], self.labels[index]
 
-    
-    
-    
+
 class CIC2019Multi(Dataset):
     
     def __init__(self, kind='train', n_features=10):
@@ -248,7 +243,7 @@ def map_multi_class_attack(attack):
     return attack_type
 
 def map_binary_class_attack(attack):
-    if attack == 'BENIGN':
+    if attack == 'BENIGN' or attack == 'Normal':
         attack_type = 0
     else:
         attack_type = 1
