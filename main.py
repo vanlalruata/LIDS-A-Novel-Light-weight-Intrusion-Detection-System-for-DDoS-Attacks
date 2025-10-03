@@ -43,7 +43,8 @@ if __name__ == '__main__':
         elif dataset_choice == 3:
             dataset_path = 'H:/Datasets/TON_IoT/Processed_datasets/Processed_Network_dataset'
         else:
-            dataset_path = PATH
+            print('Invalid dataset choice.')
+            sys.exit(1)
 
         use_path = dataset_path if dataset_path else PATH
         make_datasets(use_path, n_rows, dataset_choice)

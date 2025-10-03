@@ -225,17 +225,22 @@ def ensure_label_and_numeric(dataset, dataset_choice):
 
 
 def load_dataset_botiot(PATH, nrows):
-    # Loop all CSV files in folder with semicolon delimiter
+    # Loop specific CSV files for BoT-IoT dataset with semicolon delimiter
     print("************************************Loading Files******************************************")
     print('Loading BoT-IoT dataset from folder: ', PATH)
-    filenames = get_file_names(PATH)
-    csvs = [f for f in filenames if f.lower().endswith('.csv')]
-    if not csvs:
-        raise FileNotFoundError('No CSV files found in the provided BoT-IoT folder.')
+    
+    # Specify the BoT-IoT CSV files to load
+    filenames = [
+        'DDoS_HTTP.csv',
+        'DDoS_TCP.csv',
+        'DDoS_UDP.csv'
+    ]
+    
+    print(f"Files to load: {filenames}")
     
     i = 0
     dataset = None
-    for fname in csvs:
+    for fname in filenames:
         print('*****************************************************************************************')
         print('*****************************************************************************************')
         print('File to Load: ', fname)
@@ -286,17 +291,26 @@ def load_dataset_botiot(PATH, nrows):
 
 
 def load_dataset_toniot(PATH, nrows):
-    # Loop all CSV files in folder with comma delimiter
+    # Loop specific CSV files for TON_IoT dataset with comma delimiter
     print("************************************Loading Files******************************************")
     print('Loading TON_IoT dataset from folder: ', PATH)
-    filenames = get_file_names(PATH)
-    csvs = [f for f in filenames if f.lower().endswith('.csv')]
-    if not csvs:
-        raise FileNotFoundError('No CSV files found in the provided TON_IoT folder.')
+    
+    # Specify the TON_IoT CSV files to load
+    filenames = [
+        'Network_dataset_12.csv',
+        'Network_dataset_13.csv',
+        'Network_dataset_14.csv',
+        'Network_dataset_15.csv',
+        'Network_dataset_16.csv',
+        'Network_dataset_17.csv',
+        'Network_dataset_18.csv'
+    ]
+    
+    print(f"Files to load: {filenames}")
     
     i = 0
     dataset = None
-    for fname in csvs:
+    for fname in filenames:
         print('*****************************************************************************************')
         print('*****************************************************************************************')
         print('File to Load: ', fname)
@@ -366,8 +380,8 @@ def load_dataset(PATH, nrows):
     meaning_less_cols = ['Unnamed: 0', 'Flow ID', ' Timestamp', ' Source IP',
                          'SimillarHTTP', ' Source Port', ' Destination IP', ' Destination Port']
 
-    filenames = ['TFTP.csv', 'DrDoS_SNMP.csv', 'DrDoS_DNS.csv', 'DrDoS_MSSQL.csv', 'DrDoS_SSDP.csv',
-                 'DrDoS_NetBIOS.csv', 'DrDoS_LDAP.csv', 'DrDoS_NTP.csv', 'Syn.csv', 'UDPLag.csv', 'DrDoS_UDP.csv']
+    filenames = ['DrDoS_SNMP.csv', 'DrDoS_DNS.csv', 'DrDoS_MSSQL.csv', 'DrDoS_SSDP.csv',
+                 'DrDoS_NetBIOS.csv', 'DrDoS_LDAP.csv', 'DrDoS_NTP.csv', 'DrDoS_UDP.csv']
 
     print("************************************Loading Files******************************************")
     i = 0
