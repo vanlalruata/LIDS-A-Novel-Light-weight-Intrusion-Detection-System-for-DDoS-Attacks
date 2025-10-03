@@ -185,11 +185,17 @@ def ensure_label_and_numeric(dataset, dataset_choice):
         label_col = ' Label'
         print(f"Using existing ' Label' column. Unique values: {dataset[' Label'].unique()}")
     elif 'attack' in dataset.columns:
-        dataset[' Label'] = dataset['attack'].astype(int)
+        # For datasets with numeric attack column
+        try:
+            dataset[' Label'] = dataset['attack'].astype(int)
+        except:
+            dataset[' Label'] = dataset['attack']
         label_col = ' Label'
     elif 'label' in dataset.columns:
-        dataset[' Label'] = dataset['label'].astype(int)
+        # For BoT-IoT: label column contains strings like "DDoS - HTTP", keep as-is
+        dataset[' Label'] = dataset['label']
         label_col = ' Label'
+        print(f"Using 'label' column as ' Label'. Unique values: {dataset[' Label'].unique()}")
     elif 'type' in dataset.columns:
         # For TON_IoT, 'type' column should already be copied to ' Label'
         dataset[' Label'] = dataset['type']
@@ -257,9 +263,27 @@ def load_dataset_botiot(PATH, nrows):
         print("***************** Original File Shape ******************")
         print(df.shape)
         
+        # Merge category and subcategory columns for BoT-IoT
+        if 'category' in df.columns and 'subcategory' in df.columns:
+            print("Merging category and subcategory columns...")
+            def merge_categories(row):
+                cat = str(row['category']).strip()
+                subcat = str(row['subcategory']).strip()
+                # If both are Normal, return just "Normal"
+                if cat.upper() == 'NORMAL' and subcat.upper() == 'NORMAL':
+                    return 'Normal'
+                # Otherwise concatenate with " - "
+                return f"{cat} - {subcat}"
+            
+            df['label'] = df.apply(merge_categories, axis=1)
+            print(f"Created 'label' column from category-subcategory merge")
+            print(f"Unique labels: {df['label'].unique()}")
+        
         df.dropna(axis=0, how='all', inplace=True)
         df.drop_duplicates(inplace=True)
         print("After null and duplicate:", df.shape)
+
+        print("Column names before dropping duplicates: ", df.columns)
         
         if i == 0:
             dataset = df
