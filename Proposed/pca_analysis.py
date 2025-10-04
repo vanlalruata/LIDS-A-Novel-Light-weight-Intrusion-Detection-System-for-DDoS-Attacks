@@ -84,8 +84,19 @@ def plot_pca_analysis(dataset):
     from sklearn.preprocessing import LabelEncoder
 
     sns.set_style("whitegrid", {'axes.grid': False})
+    
+    prefix = 'CICDDoS2019'
+    try:
+        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            if s:
+                prefix = s
+    except Exception:
+        pass
 
-    fig, ax = plt.subplots(1, 2, figsize=(15, 10), subplot_kw=dict(projection='3d'))
+    # Multiclass PCA Analysis
+    fig_multi = plt.figure(figsize=(10, 8))
+    ax_multi = fig_multi.add_subplot(111, projection='3d')
 
     colors = ['black', 'grey', 'orange', 'yellowgreen', 'steelblue',
               'violet', 'hotpink', 'purple', 'lightcoral', 'cadetblue',
@@ -98,53 +109,52 @@ def plot_pca_analysis(dataset):
         pc1 = df['PC 1']
         pc2 = df['PC 2']
         pc3 = df['PC 3']
-        print(i)
-        ax[0].scatter(pc2, pc1, pc3, marker=markers[i], s=6, color=colors[i])
+        marker_idx = i % len(markers)
+        color_idx = i % len(colors)
+        ax_multi.scatter(pc2, pc1, pc3, marker=markers[marker_idx], s=6, color=colors[color_idx])
 
-    ax[0].set_xlabel('PC 2')
-    ax[0].set_ylabel('PC 1')
-    ax[0].set_zlabel('PC 3')
-    ax[0].set_title('Multi Class Analysis')
-    ax[0].legend(classses, loc=1)
-    ax[0].set_xlim3d(min(dataset['PC 2']), max(dataset['PC 2']))
-    ax[0].set_ylim3d(min(dataset['PC 1']), max(dataset['PC 1']))
-    ax[0].set_zlim3d(min(dataset['PC 3']), max(dataset['PC 3']))
+    ax_multi.set_xlabel('PC 2')
+    ax_multi.set_ylabel('PC 1')
+    ax_multi.set_zlabel('PC 3')
+    ax_multi.set_title('Multiclass PCA Analysis')
+    ax_multi.legend(classses, loc=1, fontsize=8)
+    ax_multi.set_xlim3d(min(dataset['PC 2']), max(dataset['PC 2']))
+    ax_multi.set_ylim3d(min(dataset['PC 1']), max(dataset['PC 1']))
+    ax_multi.set_zlim3d(min(dataset['PC 3']), max(dataset['PC 3']))
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_pca_multiclass_analysis.png'), dpi=600)
+    print(f"Saved multiclass PCA analysis to Images/{prefix}_pca_multiclass_analysis.png")
+    plt.close(fig_multi)
 
-    dataset[' Label'] = dataset[' Label'].map(lambda a: 'Normal' if a == 'BENIGN' else 'Attack')
+    # Binary PCA Analysis
+    dataset_binary = dataset.copy()
+    dataset_binary[' Label'] = dataset_binary[' Label'].map(lambda a: 'Normal' if str(a).upper() in ['BENIGN', 'NORMAL'] else 'Attack')
 
-    colors = ['orange', 'red']
-    classses = dataset[' Label'].unique()
-    markers = ['.', '*']
+    fig_binary = plt.figure(figsize=(10, 8))
+    ax_binary = fig_binary.add_subplot(111, projection='3d')
+    
+    colors_bin = ['orange', 'red']
+    classses_bin = dataset_binary[' Label'].unique()
+    markers_bin = ['.', '*']
 
-    for i in range(len(classses)):
-        df = dataset[dataset[' Label'] == classses[i]]
+    for i in range(len(classses_bin)):
+        df = dataset_binary[dataset_binary[' Label'] == classses_bin[i]]
         pc1 = df['PC 1']
         pc2 = df['PC 2']
         pc3 = df['PC 3']
-        ax[1].scatter(pc1, pc2, pc3, marker=markers[i], s=6, color=colors[i])
+        ax_binary.scatter(pc1, pc2, pc3, marker=markers_bin[i], s=6, color=colors_bin[i])
 
-    ax[1].set_xlabel('PC 1')
-    ax[1].set_ylabel('PC 2')
-    ax[1].set_zlabel('PC 3')
-    ax[1].set_title('Multi Class Analysis')
-    ax[1].legend(classses, loc=1)
-    ax[1].set_xlim3d(min(dataset['PC 1']), max(dataset['PC 1']))
-    ax[1].set_ylim3d(min(dataset['PC 2']), max(dataset['PC 2']))
-    ax[1].set_zlim3d(min(dataset['PC 3']), max(dataset['PC 3']))
+    ax_binary.set_xlabel('PC 1')
+    ax_binary.set_ylabel('PC 2')
+    ax_binary.set_zlabel('PC 3')
+    ax_binary.set_title('Binary PCA Analysis')
+    ax_binary.legend(classses_bin, loc=1)
+    ax_binary.set_xlim3d(min(dataset_binary['PC 1']), max(dataset_binary['PC 1']))
+    ax_binary.set_ylim3d(min(dataset_binary['PC 2']), max(dataset_binary['PC 2']))
+    ax_binary.set_zlim3d(min(dataset_binary['PC 3']), max(dataset_binary['PC 3']))
 
-    plt.subplots_adjust(left=0.05,
-                        bottom=0,
-                        right=0.95,
-                        top=1,
-                        wspace=0.1,
-                        )
-
-    prefix = 'CICDDoS2019'
-    try:
-        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
-            s = f.read().strip()
-            if s:
-                prefix = s
-    except Exception:
-        pass
-    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_pca_analysis.png'), dpi=600)
+    plt.tight_layout()
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_pca_binary_analysis.png'), dpi=600)
+    print(f"Saved binary PCA analysis to Images/{prefix}_pca_binary_analysis.png")
+    plt.close(fig_binary)

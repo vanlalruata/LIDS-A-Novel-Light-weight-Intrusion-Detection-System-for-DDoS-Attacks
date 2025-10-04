@@ -24,7 +24,16 @@ def class_distributions(dataset):
         keys.append(key)
         values.append(value)
 
-    expl = [0.01, 0.01, 0.01, 0.01, 0.01, 0.1, 0.2, 0.25, 0.3, 0.35, 0.4, 0.6, 0.65]
+    # Dynamic explode values based on number of classes
+    num_classes = len(values)
+    if num_classes <= 2:
+        expl = [0.05] * num_classes
+    elif num_classes <= 5:
+        expl = [0.05 + i*0.02 for i in range(num_classes)]
+    else:
+        # For many classes, use progressive explosion
+        expl = [0.01 + (i * 0.05) for i in range(num_classes)]
+    
     pctdist = 0.85
 
     ax = plt.subplot2grid((1, 2), (0, 0))
@@ -97,7 +106,37 @@ def class_distributions(dataset):
                         )
 
     prefix = _get_current_prefix()
-    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_class_distribution.png'), dpi=600)
+    # Save multiclass distribution
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_multiclass_distribution.png'), dpi=600)
+    print(f"Saved multiclass distribution to Images/{prefix}_multiclass_distribution.png")
+    
+    # Create separate binary distribution plot
+    plt.figure(figsize=(6, 6))
+    labels_bin = ['Normal', 'Attack']
+    
+    # Handle different label formats (string or numeric)
+    if dataset[' Label'].dtype == 'object':
+        # String labels
+        normal_mask = dataset[' Label'].str.upper().isin(['BENIGN', 'NORMAL'])
+        normal = normal_mask.sum()
+    else:
+        # Numeric labels (0 = normal)
+        normal = (dataset[' Label'] == 0).sum()
+    
+    attack = len(dataset) - normal
+    
+    plt.pie([normal, attack], explode=[0.05, 0.05], autopct='%1.2f%%', pctdistance=0.85,
+            wedgeprops={"edgecolor": "black", 'linewidth': 0.2, 'antialiased': True},
+            textprops={'fontsize': 8}, labels=labels_bin)
+    plt.title('Binary Class Distribution', size=10)
+    
+    centre_circle = plt.Circle((0, 0), 0.30, fc='white')
+    plt.gcf().gca().add_artist(centre_circle)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_binary_distribution.png'), dpi=600)
+    print(f"Saved binary distribution to Images/{prefix}_binary_distribution.png")
+    plt.close()
 
 
 def pca_analysis(dataset, components=3):
@@ -141,16 +180,23 @@ def plot_files_preprocessing():
     """
     Plots pie charts of the individual files describing the amount of data deleted after
     nan deletion, drop duplicates and meaningless col deletion
-    Note: This function is specific to CICDDoS2019 dataset with hardcoded file statistics.
     """
     prefix = _get_current_prefix()
     
-    # Check if current dataset is CICDDoS2019
-    if prefix != 'CICDDoS2019':
-        print(f"Warning: plot_files_preprocessing() is designed for CICDDoS2019 dataset.")
-        print(f"Current dataset: {prefix}")
-        print("Skipping file preprocessing visualization for this dataset.")
+    if prefix == 'CICDDoS2019':
+        plot_files_preprocessing_cicdos()
+    elif prefix == 'BoT-IoT':
+        plot_files_preprocessing_botiot()
+    elif prefix == 'TON_IoT':
+        plot_files_preprocessing_toniot()
+    else:
+        print(f"Warning: No file preprocessing visualization available for dataset: {prefix}")
         return
+
+
+def plot_files_preprocessing_cicdos():
+    """CICDDoS2019 specific file preprocessing visualization"""
+    prefix = 'CICDDoS2019'
     
     filenames = ['TFTP', 'DrDoS SNMP', 'DrDoS DNS', 'DrDoS MSSQL', 'DrDoS SSDP',
                  'DrDoS NetBIOS', 'DrDoS LDAP', 'DrDoS NTP', 'Syn', 'UDPLag', 'DrDoS UDP']
@@ -210,6 +256,92 @@ def plot_files_preprocessing():
 
             index += 1
     plt.subplots_adjust(wspace=0, hspace=0.2)
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_files_distribution.png'), dpi=600)
+    print(f"Saved file preprocessing plot to Images/{prefix}_files_distribution.png")
+
+
+def plot_files_preprocessing_botiot():
+    """BoT-IoT specific file preprocessing visualization"""
+    prefix = 'BoT-IoT'
+    filenames = ['DDoS HTTP', 'DDoS TCP', 'DDoS UDP']
+    
+    # Placeholder values - update with actual statistics after processing
+    original_size = [19826, 500000, 500000]
+    after_size = [19826, 500000, 500000]
+    deleted = [0, 0, 0]
+    
+    labels = ['After Processing', 'Deleted']
+    expl = [0.05, 0.05]
+    index = 0
+    pctdist = 0.6
+    
+    fig = plt.figure(figsize=(12, 4))
+    for i in range(len(filenames)):
+        ax = plt.subplot(1, len(filenames), i + 1)
+        plt.rcParams["font.serif"] = "Times New Roman"
+        
+        patches, texts, autotexts = plt.pie([after_size[i], deleted[i]], explode=expl, autopct='%1.2f%%',
+                                            pctdistance=pctdist,
+                                            wedgeprops={"edgecolor": "black",
+                                                        'linewidth': 0.2,
+                                                        'antialiased': True}, textprops={'fontsize': 6},
+                                            colors=['orange', 'mediumspringgreen'])
+        
+        for patch, txt in zip(patches, autotexts):
+            ang = (patch.theta2 + patch.theta1) / 2.
+            x = (1 * np.cos(ang * np.pi / 180))
+            y = (1 * np.sin(ang * np.pi / 180))
+            if (patch.theta2 - patch.theta1) < 20:
+                txt.set_position((x - 0.4, y + 0.1))
+        
+        plt.title(filenames[i], size=8)
+        centre_circle = plt.Circle((0, 0), 0.30, fc='white')
+        fig.gca().add_artist(centre_circle)
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_files_distribution.png'), dpi=600)
+    print(f"Saved file preprocessing plot to Images/{prefix}_files_distribution.png")
+
+
+def plot_files_preprocessing_toniot():
+    """TON_IoT specific file preprocessing visualization"""
+    prefix = 'TON_IoT'
+    filenames = ['Network 12', 'Network 13', 'Network 14', 'Network 15',
+                 'Network 16', 'Network 17', 'Network 18']
+    
+    # Placeholder values - update with actual statistics after processing
+    original_size = [100000] * 7
+    after_size = [100000] * 7
+    deleted = [0] * 7
+    
+    labels = ['After Processing', 'Deleted']
+    expl = [0.05, 0.05]
+    pctdist = 0.6
+    
+    fig = plt.figure(figsize=(15, 6))
+    for i in range(len(filenames)):
+        ax = plt.subplot(2, 4, i + 1)
+        plt.rcParams["font.serif"] = "Times New Roman"
+        
+        patches, texts, autotexts = plt.pie([after_size[i], deleted[i]], explode=expl, autopct='%1.2f%%',
+                                            pctdistance=pctdist,
+                                            wedgeprops={"edgecolor": "black",
+                                                        'linewidth': 0.2,
+                                                        'antialiased': True}, textprops={'fontsize': 6},
+                                            colors=['orange', 'mediumspringgreen'])
+        
+        for patch, txt in zip(patches, autotexts):
+            ang = (patch.theta2 + patch.theta1) / 2.
+            x = (1 * np.cos(ang * np.pi / 180))
+            y = (1 * np.sin(ang * np.pi / 180))
+            if (patch.theta2 - patch.theta1) < 20:
+                txt.set_position((x - 0.4, y + 0.1))
+        
+        plt.title(filenames[i], size=6)
+        centre_circle = plt.Circle((0, 0), 0.30, fc='white')
+        fig.gca().add_artist(centre_circle)
+    
+    plt.tight_layout()
     plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_files_distribution.png'), dpi=600)
     print(f"Saved file preprocessing plot to Images/{prefix}_files_distribution.png")
 
