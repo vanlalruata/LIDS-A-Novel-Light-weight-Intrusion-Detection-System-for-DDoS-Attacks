@@ -321,13 +321,29 @@ def load_dataset_toniot(PATH, nrows):
     
     # Specify the TON_IoT CSV files to load
     filenames = [
+        'Network_dataset_1.csv',
+        'Network_dataset_2.csv',
+        'Network_dataset_3.csv',
+        'Network_dataset_4.csv',
+        'Network_dataset_5.csv',
+        'Network_dataset_6.csv',
+        'Network_dataset_7.csv',
+        'Network_dataset_8.csv',
+        'Network_dataset_9.csv',
+        'Network_dataset_10.csv',
+        'Network_dataset_11.csv',
         'Network_dataset_12.csv',
         'Network_dataset_13.csv',
         'Network_dataset_14.csv',
         'Network_dataset_15.csv',
         'Network_dataset_16.csv',
         'Network_dataset_17.csv',
-        'Network_dataset_18.csv'
+        'Network_dataset_18.csv',
+        'Network_dataset_19.csv',
+        'Network_dataset_20.csv',
+        'Network_dataset_21.csv',
+        'Network_dataset_22.csv',
+        'Network_dataset_23.csv'
     ]
     
     print(f"Files to load: {filenames}")
@@ -346,6 +362,22 @@ def load_dataset_toniot(PATH, nrows):
         
         print("*****************Original File Shape******************")
         print(df.shape)
+        
+        # Filter TON_IoT dataset to keep only 'normal' and 'ddos' types
+        if 'type' in df.columns:
+            print("Filtering TON_IoT dataset to keep only 'normal' and 'ddos' types...")
+            before_filter = len(df)
+            # Convert to lowercase for case-insensitive comparison
+            df['type'] = df['type'].astype(str).str.lower().str.strip()
+            
+            # Drop rows with unwanted attack types
+            unwanted_types = ['injection', 'password', 'xss', 'ransomware', 'backdoor', 'scanning', 'dos']
+            df = df[~df['type'].isin(unwanted_types)]
+            
+            after_filter = len(df)
+            dropped = before_filter - after_filter
+            print(f"Filtered out {dropped} rows with unwanted attack types")
+            print(f"Remaining types: {df['type'].unique()}")
         
         # For TON_IoT: Use 'type' column as ' Label' and drop 'label' column
         if 'type' in df.columns:
