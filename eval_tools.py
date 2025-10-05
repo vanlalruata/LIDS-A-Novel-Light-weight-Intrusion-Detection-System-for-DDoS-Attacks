@@ -42,6 +42,7 @@ def classification_report(outputs, labels):
         precision = precision_score(predictions, labels)
         print("Accuracy : {}, Recall : {}, F1 Score : {} Precision {}".format(accuracy, recall, f1, precision))
         print("************************* Confusion Matrix ***********************")
+        print("Labels: [Normal, Attack]")
         print(cm)
 
 
@@ -66,10 +67,27 @@ def classification_report_multi(outputs, labels):
         f1 = f1_score(predictions, labels, average='weighted')
         cm = confusion_matrix(predictions, labels)
         precision = precision_score(predictions, labels, average='weighted')
-        # precision = precision_score(predictions, labels)
-        print("Accuracy : {}, Recall : {}, F1 Score : {} Precision {}".format(accuracy, recall, f1, precision))
-        print("************************* Confusion Matrix ***********************")
-        print(cm)
+        
+        # Load label mapping
+        try:
+            import os
+            import numpy as np
+            classes_path = os.path.join(os.getcwd(), 'Datasets', 'label_classes.npy')
+            if os.path.exists(classes_path):
+                label_classes = np.load(classes_path, allow_pickle=True)
+                print("Accuracy : {}, Recall : {}, F1 Score : {} Precision {}".format(accuracy, recall, f1, precision))
+                print("************************* Confusion Matrix ***********************")
+                print(f"Labels: {list(label_classes)}")
+                print(cm)
+            else:
+                print("Accuracy : {}, Recall : {}, F1 Score : {} Precision {}".format(accuracy, recall, f1, precision))
+                print("************************* Confusion Matrix ***********************")
+                print("Labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]")
+                print(cm)
+        except Exception as e:
+            print("Accuracy : {}, Recall : {}, F1 Score : {} Precision {}".format(accuracy, recall, f1, precision))
+            print("************************* Confusion Matrix ***********************")
+            print(cm)
 
 
 def evaluate_proposed_model(model, test_loader, mode):

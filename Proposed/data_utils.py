@@ -215,6 +215,27 @@ def ensure_label_and_numeric(dataset, dataset_choice):
     # Convert non-numeric feature columns to numeric via label encoding
     from sklearn.preprocessing import LabelEncoder
     le = LabelEncoder()
+    
+    # Print label mapping if labels are being encoded
+    if dataset[' Label'].dtype == 'object':
+        print("\n" + "="*80)
+        print("LABEL ENCODING MAPPING:")
+        print("="*80)
+        unique_labels = sorted(dataset[' Label'].unique())
+        label_encoder = LabelEncoder()
+        encoded_labels = label_encoder.fit_transform(dataset[' Label'])
+        
+        # Create mapping dictionary
+        label_mapping = {}
+        for orig_label in unique_labels:
+            encoded_val = label_encoder.transform([orig_label])[0]
+            label_mapping[orig_label] = encoded_val
+        
+        # Print mapping
+        for orig, encoded in sorted(label_mapping.items(), key=lambda x: x[1]):
+            print(f"  '{orig}' → {encoded}")
+        print("="*80 + "\n")
+    
     for col in list(dataset.columns):
         if col == ' Label':
             continue
