@@ -371,8 +371,8 @@ def load_dataset_toniot(PATH, nrows):
             df['type'] = df['type'].astype(str).str.lower().str.strip()
             
             # Drop rows with unwanted attack types
-            # unwanted_types = ['injection', 'password', 'xss', 'ransomware', 'backdoor', 'scanning', 'dos', 'mitm']
-            # df = df[~df['type'].isin(unwanted_types)]
+            unwanted_types = ['injection', 'password', 'xss', 'ransomware', 'backdoor', 'scanning', 'dos', 'mitm']
+            df = df[~df['type'].isin(unwanted_types)]
             
             after_filter = len(df)
             dropped = before_filter - after_filter
@@ -413,7 +413,9 @@ def load_dataset_toniot(PATH, nrows):
     print("************************************ Files Loaded ******************************************")
     
     # Drop unwanted TON_IoT columns if present (including 'label' and 'ts')
-    drop_cols = ['ts', 'src_ip','src_port','dst_ip','dst_port','proto','service','http_user_agent','http_orig_mime_types','http_resp_mime_types','weird_name','weird_addl','weird_notice','dns_AA','dns_RD','dns_RA','dns_rejected','ssl_version','ssl_cipher','ssl_resumed','ssl_established','ssl_subject','ssl_issuer','http_trans_depth','http_method','http_uri','http_referrer','http_version','dns_query', 'label']
+    # drop_cols = ['src_ip','dst_ip','proto','service','http_user_agent','http_orig_mime_types','http_resp_mime_types','weird_name','weird_addl','weird_notice','dns_AA','dns_RD','dns_RA','dns_rejected','ssl_version','ssl_cipher','ssl_resumed','ssl_established','ssl_subject','ssl_issuer','http_trans_depth','http_method','http_uri','http_referrer','http_version','dns_query', 'label']
+    drop_cols = ['']
+
     to_drop = [c for c in drop_cols if c in dataset.columns]
     if to_drop:
         print('Dropping TON_IoT columns:', to_drop)
