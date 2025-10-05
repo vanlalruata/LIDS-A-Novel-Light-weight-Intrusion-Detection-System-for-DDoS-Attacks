@@ -67,9 +67,10 @@ def class_distributions(dataset):
         if (patch.theta2 - patch.theta1) < 5:
             txt.set_position((x, y - 0.1))
         i = i + 1
-    plt.title(' Multi Class Distributions', size=8)
+    plt.title('Multi Class Distributions', size=10, fontweight='bold')
 
-    plt.legend(keys, fontsize=4, bbox_to_anchor=(-0.11, 0.7, 0.3, 0.5))
+    plt.legend(keys, fontsize=7, bbox_to_anchor=(-0.11, 0.7, 0.3, 0.5),
+               frameon=True, fancybox=True, shadow=True, prop={'weight': 'bold'})
 
     centre_circle = plt.Circle((0, 0), 0.30, fc='white')
 
@@ -93,8 +94,8 @@ def class_distributions(dataset):
                         'linewidth': 0.2,
                         'antialiased': True}, textprops={'fontsize': 6})
 
-    plt.title('Binary Class Distributions', size=8)
-    plt.legend(labels, fontsize=4)
+    plt.title('Binary Class Distributions', size=10, fontweight='bold')
+    plt.legend(labels, fontsize=8, frameon=True, fancybox=True, shadow=True, prop={'weight': 'bold'})
 
     centre_circle = plt.Circle((0, 0), 0.30, fc='white')
 
@@ -137,7 +138,8 @@ def class_distributions(dataset):
     plt.pie([normal, attack], explode=[0.05, 0.05], autopct='%1.2f%%', pctdistance=0.85,
             wedgeprops={"edgecolor": "black", 'linewidth': 0.2, 'antialiased': True},
             textprops={'fontsize': 8}, labels=labels_bin)
-    plt.title('Binary Class Distribution', size=10)
+    plt.title('Binary Class Distribution', size=12, fontweight='bold')
+    plt.legend(labels_bin, fontsize=10, frameon=True, fancybox=True, shadow=True, prop={'weight': 'bold'})
     
     centre_circle = plt.Circle((0, 0), 0.30, fc='white')
     plt.gcf().gca().add_artist(centre_circle)

@@ -30,47 +30,43 @@ def principal_component_varience():
     limit_df = 10
     explained_variance_limited = explained_variance.iloc[:limit_df, :]
 
-    # Plot 1: Explained variance (bar chart)
-    fig1, ax1 = plt.subplots(figsize=(15, 6))
-    ax1.set_title('Explained Variance Across Principal Components', fontsize=14)
+    # Get prefix
+    prefix = 'CICDDoS2019'
+    try:
+        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
+            s = f.read().strip()
+            if s:
+                prefix = s
+    except Exception:
+        pass
+
+    # Combined plot: Explained variance and Cumulative variance
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+    
+    # Left: Explained variance (bar chart)
+    ax1.set_title('Explained Variance Across Principal Components', fontsize=14, fontweight='bold')
     ax1.set_xlabel('Principal Components', fontsize=12)
     ax1.set_ylabel('Explained Variance', fontsize=12)
     sns.barplot(x=idx[:limit_df], y='explained variance', data=explained_variance_limited, color='tab:green', ax=ax1)
-    ax1.axhline(mean_explained_variance, ls='--', color='grey')  # plot mean
-    ax1.text(1.5, mean_explained_variance + (mean_explained_variance * .05), "Average", color='black', fontsize=14)
+    ax1.axhline(mean_explained_variance, ls='--', color='grey')
+    ax1.text(1.5, mean_explained_variance + (mean_explained_variance * .05), "Average", color='black', fontsize=12)
     max_y1 = max(explained_variance_limited.iloc[:, 0])
     ax1.set(ylim=(0, max_y1 + max_y1 * .1))
-    plt.tight_layout()
-    prefix = 'CICDDoS2019'
-    try:
-        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
-            s = f.read().strip()
-            if s:
-                prefix = s
-    except Exception:
-        pass
-    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_explained_varience_pca.png'), dpi=600)
-    plt.close(fig1)
-
-    # Plot 2: Cumulative explained variance (line chart)
-    fig2, ax2 = plt.subplots(figsize=(15, 6))
-    ax2.set_title('Cumulative Explained Variance', fontsize=14)
+    ax1.grid(True, alpha=0.3)
+    
+    # Right: Cumulative explained variance (line chart)
+    ax2.set_title('Cumulative Explained Variance', fontsize=14, fontweight='bold')
     ax2.set_xlabel('Principal Components', fontsize=12)
     ax2.set_ylabel('Cumulative Explained Variance', fontsize=12)
-    sns.lineplot(x=idx[:limit_df], y='cumulative', data=explained_variance_limited, color='black', ax=ax2)
+    sns.lineplot(x=idx[:limit_df], y='cumulative', data=explained_variance_limited, color='dodgerblue', linewidth=2, ax=ax2)
     max_y2 = max(explained_variance_limited.iloc[:, 1])
     ax2.set(ylim=(0, max_y2 + max_y2 * .1))
+    ax2.grid(True, alpha=0.3)
+    
     plt.tight_layout()
-    prefix = 'CICDDoS2019'
-    try:
-        with open(os.path.join(os.getcwd(), 'Datasets', 'current_dataset_prefix.txt'), 'r', encoding='utf-8') as f:
-            s = f.read().strip()
-            if s:
-                prefix = s
-    except Exception:
-        pass
-    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_cumulative_explained_varience_pca.png'), dpi=600)
-    plt.close(fig2)
+    plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_pca_variance_analysis.png'), dpi=600)
+    print(f"Saved PCA variance analysis to Images/{prefix}_pca_variance_analysis.png")
+    plt.close(fig)
 
     print("******************************PCA Done*******************************")
 
