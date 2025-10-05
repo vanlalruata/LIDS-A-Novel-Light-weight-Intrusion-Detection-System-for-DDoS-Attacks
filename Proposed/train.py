@@ -161,27 +161,25 @@ def trainer(EPOCHS, BATCH_SIZE):
 
         print('*************** Saving the Trained Model ************** ')
 
-        path_to_saved_model = os.getcwd() +  '/PretrainedModel/'
+        prefix = _get_current_prefix()
+        path_to_saved_model = os.path.join(os.getcwd(), 'PretrainedModel')
 
         # checking if directory exists if not create one
         if not os.path.exists(path_to_saved_model):
             os.mkdir(path_to_saved_model)
 
-        #assigning the model name accoring to train times
+        #assigning the model name according to train times with dataset prefix
         version = 1
         while(True):
-
-            name = 'modelv'+str(version) + '.pth'
-            model_name = path_to_saved_model +  name
+            name = f'{prefix}_modelv{version}.pth'
+            model_name = os.path.join(path_to_saved_model, name)
             if os.path.exists(model_name):
                 version += 1
             else:
                 break
 
-
-        torch.save(model.state_dict(),  model_name)
-
-        print('*************** Model Saved Sucessfully ************** ')
+        torch.save(model.state_dict(), model_name)
+        print(f'*************** Model Saved Successfully: {name} ************** ')
 
         
         
@@ -312,24 +310,22 @@ def trainer_multi(EPOCHS, BATCH_SIZE):
 
         print('*************** Saving the Trained Model ************** ')
 
-        path_to_saved_model = os.getcwd() +  '/PretrainedModelMulti/'
+        prefix = _get_current_prefix()
+        path_to_saved_model = os.path.join(os.getcwd(), 'PretrainedModelMulti')
 
         # checking if directory exists if not create one
         if not os.path.exists(path_to_saved_model):
             os.mkdir(path_to_saved_model)
 
-        #assigning the model name accoring to train times
+        #assigning the model name according to train times with dataset prefix
         version = 1
         while(True):
-
-            name = 'modelMultiv'+str(version) + '.pth'
-            model_name = path_to_saved_model +  name
+            name = f'{prefix}_modelMultiv{version}.pth'
+            model_name = os.path.join(path_to_saved_model, name)
             if os.path.exists(model_name):
                 version += 1
             else:
                 break
 
-
-        torch.save(model.state_dict(),  model_name)
-
-        print('*************** Model Saved Sucessfully ************** ')
+        torch.save(model.state_dict(), model_name)
+        print(f'*************** Model Saved Successfully: {name} ************** ')
