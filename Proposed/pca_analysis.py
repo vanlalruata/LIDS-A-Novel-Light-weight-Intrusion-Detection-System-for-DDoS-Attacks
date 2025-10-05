@@ -98,9 +98,9 @@ def plot_pca_analysis(dataset):
     fig_multi = plt.figure(figsize=(10, 8))
     ax_multi = fig_multi.add_subplot(111, projection='3d')
 
-    colors = ['black', 'grey', 'orange', 'yellowgreen', 'steelblue',
-              'violet', 'hotpink', 'purple', 'lightcoral', 'cadetblue',
-              'blueviolet', 'orchid', 'cyan']
+    colors = ['orange', 'dodgerblue', 'limegreen', 'red', 'purple',
+              'gold', 'hotpink', 'cyan', 'coral', 'teal',
+              'magenta', 'yellowgreen', 'navy']
     classses = dataset[' Label'].unique()
     markers = ['+', '*', 'v', '<', '>', 'X', 'D', 'h', 'x', 'p', 'P', '8', 's']
 

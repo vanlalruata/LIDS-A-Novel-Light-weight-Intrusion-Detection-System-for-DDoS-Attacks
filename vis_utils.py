@@ -36,12 +36,21 @@ def class_distributions(dataset):
     
     pctdist = 0.85
 
+    fig = plt.figure(figsize=(12, 6))
     ax = plt.subplot2grid((1, 2), (0, 0))
+    
+    # Generate distinct colors for each class
+    import matplotlib.cm as cm
+    color_map = cm.get_cmap('tab20')
+    pie_colors = [color_map(i / num_classes) for i in range(num_classes)]
 
     patches, texts, autotexts = plt.pie(values, explode=expl, autopct='%1.2f%%', pctdistance=pctdist,
-                                        wedgeprops={"edgecolor": "black",
-                                                    'linewidth': 0.2,
-                                                    'antialiased': True}, textprops={'fontsize': 6}, startangle=40)
+                                        wedgeprops={"edgecolor": "white",
+                                                    'linewidth': 1.5,
+                                                    'antialiased': True},
+                                        textprops={'fontsize': 6},
+                                        startangle=40,
+                                        colors=pie_colors)
 
     i = 0
     for patch, txt in zip(patches, autotexts):
@@ -362,22 +371,24 @@ def plot_proposed_model_accuracy_loss():
 
     # Accuracy figure
     plt.figure(figsize=(8, 5))
-    plt.plot(data['Unnamed: 0'], data['Train Accuracy'], color='grey', label='Train')
-    plt.plot(data['Unnamed: 0'], data['Validation Accuracy'], color='black', label='Validation')
+    plt.plot(data['Unnamed: 0'], data['Train Accuracy'], color='orange', linewidth=2, label='Train')
+    plt.plot(data['Unnamed: 0'], data['Validation Accuracy'], color='dodgerblue', linewidth=2, label='Validation')
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_accuracy.png'), dpi=600)
     plt.close()
 
     # Loss figure
     plt.figure(figsize=(8, 5))
-    plt.plot(data['Unnamed: 0'], data['Train Loss'], color='grey', label='Train')
-    plt.plot(data['Unnamed: 0'], data['Validation Loss'], color='black', label='Validation')
+    plt.plot(data['Unnamed: 0'], data['Train Loss'], color='orange', linewidth=2, label='Train')
+    plt.plot(data['Unnamed: 0'], data['Validation Loss'], color='dodgerblue', linewidth=2, label='Validation')
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_loss.png'), dpi=600)
     plt.close()
@@ -398,22 +409,24 @@ def plot_multi_proposed_model_accuracy_loss():
 
     # Accuracy figure
     plt.figure(figsize=(8, 5))
-    plt.plot(data['Unnamed: 0'], data['Train Accuracy'], color='grey', label='Train')
-    plt.plot(data['Unnamed: 0'], data['Validation Accuracy'], color='black', label='Validation')
+    plt.plot(data['Unnamed: 0'], data['Train Accuracy'], color='limegreen', linewidth=2, label='Train')
+    plt.plot(data['Unnamed: 0'], data['Validation Accuracy'], color='purple', linewidth=2, label='Validation')
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Accuracy')
+    plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_multi_accuracy.png'), dpi=600)
     plt.close()
 
     # Loss figure
     plt.figure(figsize=(8, 5))
-    plt.plot(data['Unnamed: 0'], data['Train Loss'], color='grey', label='Train')
-    plt.plot(data['Unnamed: 0'], data['Validation Loss'], color='black', label='Validation')
+    plt.plot(data['Unnamed: 0'], data['Train Loss'], color='limegreen', linewidth=2, label='Train')
+    plt.plot(data['Unnamed: 0'], data['Validation Loss'], color='purple', linewidth=2, label='Validation')
     plt.legend()
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
+    plt.grid(True, alpha=0.3)
     plt.tight_layout()
     plt.savefig(os.path.join(os.getcwd(), 'Images', f'{prefix}_proposed_model_multi_loss.png'), dpi=600)
     plt.close()
