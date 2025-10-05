@@ -109,7 +109,7 @@ def trainer(EPOCHS, BATCH_SIZE):
                 train_losses.append(loss.item())
                 train_acces.append(accuracy(outputs, labels))
 
-            model.summary()
+            # model.summary()
 
             model.eval()
             validation_bar = tqdm(validation_loader, file=sys.stdout)
@@ -260,7 +260,7 @@ def trainer_multi(EPOCHS, BATCH_SIZE):
                 train_losses.append(loss.item())
                 train_acces.append(accuracy(outputs, labels))
 
-            model.summary()
+            # model.summary()
 
             model.eval()
             validation_bar = tqdm(validation_loader, file=sys.stdout)
