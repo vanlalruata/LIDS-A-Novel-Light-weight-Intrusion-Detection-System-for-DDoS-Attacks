@@ -291,7 +291,7 @@ def trainer_multi(EPOCHS, BATCH_SIZE):
             
             epoch += 1
 
-            # Printing the model Traning Accuracy and Testing Accuracy
+            # Printing the model Training Accuracy and Testing Accuracy
 
             print("Epoch: {}, Train Loss: {}, Val Loss: {}, Train Accuracy: {}, Val Accuracy: {}".format(epoch, train_loss, val_loss, train_acc, val_acc))
         

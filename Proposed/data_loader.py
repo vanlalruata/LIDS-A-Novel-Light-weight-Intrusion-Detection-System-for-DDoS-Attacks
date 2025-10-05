@@ -210,40 +210,40 @@ def get_split_dataset(dataset, split=0.2):
     test_size = len(dataset) - val_size
     return test_size, val_size
 
-
-
 def map_multi_class_attack(attack):
-    if attack == 'BENIGN':
+    if attack == 'BENIGN' or attack == 'Normal' or attack == 'normal':
         attack_type = 0
-    elif attack == 'DrDoS_DNS':
+    elif attack == 'DrDoS_DNS' or attack == 'DDoS_HTTP' or attack == 'dos':
         attack_type = 1
-    elif attack == 'DrDoS_LDAP':
+    elif attack == 'DrDoS_LDAP' or attack == 'DDoS_TCP' or attack == 'ddos':
         attack_type = 2
-    elif attack == 'DrDoS_MSSQL':
+    elif attack == 'DrDoS_MSSQL' or attack == 'DDoS_UDP' or attack == 'xss':
         attack_type = 3
-    elif attack == 'DrDoS_NTP':
+    elif attack == 'DrDoS_NTP' or attack == 'DoS_TCP' or attack == 'injection':
         attack_type = 4 
-    elif attack == 'DrDoS_NetBIOS':
+    elif attack == 'DrDoS_NetBIOS' or attack == 'DoS_UDP' or attack == 'password':
         attack_type = 5
-    elif attack == 'DrDoS_SNMP':
+    elif attack == 'DrDoS_SNMP' or attack == 'injection':
         attack_type = 6
-    elif attack == 'DrDoS_SSDP':
+    elif attack == 'DrDoS_SSDP'  or attack == 'backdoor':
         attack_type = 7
-    elif attack == 'DrDoS_UDP':
+    elif attack == 'DrDoS_UDP' or attack == 'ransomware':
         attack_type = 8
-    elif attack == 'Syn':
+    elif attack == 'Syn' or attack == 'scanning':
         attack_type = 9
-    elif attack == 'TFTP':
+    elif attack == 'TFTP' or attack == 'mitm':
         attack_type = 10
     elif attack == 'UDP-lag':
         attack_type = 11
     elif attack == 'WebDDoS':
         attack_type = 12
-    
+    else:
+        attack_type = 13
+
     return attack_type
 
 def map_binary_class_attack(attack):
-    if attack == 'BENIGN' or attack == 'Normal':
+    if attack == 'BENIGN' or attack == 'Normal' or attack == 'normal':
         attack_type = 0
     else:
         attack_type = 1
