@@ -185,7 +185,7 @@ def ensure_label_and_numeric(dataset, dataset_choice):
         label_col = ' Label'
         print(f"Using existing ' Label' column. Unique values: {dataset[' Label'].unique()}")
     elif 'attack' in dataset.columns:
-        # For datasets with numeric attack column
+        # For datasets with a numeric attack column
         try:
             dataset[' Label'] = dataset['attack'].astype(int)
         except:
@@ -197,7 +197,7 @@ def ensure_label_and_numeric(dataset, dataset_choice):
         label_col = ' Label'
         print(f"Using 'label' column as ' Label'. Unique values: {dataset[' Label'].unique()}")
     elif 'type' in dataset.columns:
-        # For TON_IoT, 'type' column should already be copied to ' Label'
+        # For TON_IoT, the 'type' column should already be copied to ' Label'
         dataset[' Label'] = dataset['type']
         label_col = ' Label'
     elif 'Category' in dataset.columns:
@@ -225,7 +225,7 @@ def ensure_label_and_numeric(dataset, dataset_choice):
         label_encoder = LabelEncoder()
         encoded_labels = label_encoder.fit_transform(dataset[' Label'])
         
-        # Create mapping dictionary
+        # Create a mapping dictionary
         label_mapping = {}
         for orig_label in unique_labels:
             encoded_val = label_encoder.transform([orig_label])[0]

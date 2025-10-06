@@ -18,7 +18,6 @@ n_rows = 5000000
 
 if __name__ == '__main__':
 
-
     print("1. Proposed Preprocessing: Create Dataset")
     print("2. Create PCA Dataset using processed dataset")
     print("3. Visualization")
