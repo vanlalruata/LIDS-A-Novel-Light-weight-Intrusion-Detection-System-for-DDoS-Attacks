@@ -459,8 +459,9 @@ def load_dataset(PATH, nrows):
     """
 
     # filenames= get_file_names(PATH)
-    meaning_less_cols = ['Unnamed: 0', 'Flow ID', ' Timestamp', ' Source IP',
-                         'SimillarHTTP', ' Source Port', ' Destination IP', ' Destination Port']
+    # meaning_less_cols = ['Unnamed: 0', 'Flow ID', ' Timestamp', ' Source IP',
+    #                      'SimillarHTTP', ' Source Port', ' Destination IP', ' Destination Port']
+    meaning_less_cols = []
 
     filenames = ['DrDoS_SNMP.csv', 'DrDoS_DNS.csv', 'DrDoS_MSSQL.csv', 'DrDoS_SSDP.csv',
                  'DrDoS_NetBIOS.csv', 'DrDoS_LDAP.csv', 'DrDoS_NTP.csv', 'DrDoS_UDP.csv']
