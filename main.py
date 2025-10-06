@@ -14,7 +14,7 @@ if os.getcwd() != script_dir:
 EPOCHS = 100
 BATCH_SIZE = 1024
 PATH = 'H:/Datasets/CIC-DDoS2019/01-12'
-n_rows = 500000000
+n_rows = 5000000
 
 if __name__ == '__main__':
 
