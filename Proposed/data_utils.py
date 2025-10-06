@@ -480,7 +480,8 @@ def load_dataset(PATH, nrows):
 
             if i == 0:
 
-                dataset = pd.read_csv(item, nrows=nrows)
+                # dataset = pd.read_csv(item, nrows=nrows)
+                dataset = pd.read_csv(item)
                 print("*****************Original File Shape******************")
                 print(dataset.shape)
 
@@ -492,7 +493,8 @@ def load_dataset(PATH, nrows):
 
             else:
 
-                df1 = pd.read_csv(item, nrows=nrows)
+                # df1 = pd.read_csv(item, nrows=nrows)
+                dataset = pd.read_csv(item)
                 print("*****************Original File Shape***************")
                 print(df1.shape)
 
