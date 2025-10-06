@@ -179,7 +179,7 @@ def make_datasets(PATH, nrows, dataset_choice=1):
 
 
 def ensure_label_and_numeric(dataset, dataset_choice):
-    # Standardize label column to ' Label' and convert features to numeric
+    # Standardize the label column to ' Label' and convert features to numeric
     label_col = None
     if ' Label' in dataset.columns:
         label_col = ' Label'
@@ -455,7 +455,7 @@ def load_dataset(PATH, nrows):
     """
     1. load an individual file
     2. drop na and duplicates
-    3. Concnate with the previous file that is loaded
+    3. Concat with the previous file that is loaded
     """
 
     # filenames= get_file_names(PATH)

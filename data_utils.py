@@ -100,7 +100,7 @@ def drop_constant_features(dataset):
 
     dataset.drop(columns_with_one_value, axis=1, inplace=True)
 
-    print("Droped Constant Features:")
+    print("Dropped Constant Features:")
     for i in range(len(columns_with_one_value)):
         print("{}. {}".format(i + 1, columns_with_one_value[i]))
 

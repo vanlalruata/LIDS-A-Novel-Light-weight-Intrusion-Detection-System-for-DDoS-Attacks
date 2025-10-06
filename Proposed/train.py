@@ -89,7 +89,7 @@ def trainer(EPOCHS, BATCH_SIZE):
             for step, (samples, labels) in enumerate(train_bar):
                 
                 
-                # Transfering samples and labels to GPU if available
+                # Transferring samples and labels to GPU if available
                 samples, labels = samples.to(device), labels.to(device)
                 labels = labels.type(torch.int64)
 
@@ -144,7 +144,7 @@ def trainer(EPOCHS, BATCH_SIZE):
             
             epoch += 1
 
-            # Printing the model Traning Accuracy and Testing Accuracy
+            # Printing the model Training Accuracy and Testing Accuracy
 
             print("Epoch: {}, Train Loss: {}, Val Loss: {}, Train Accuracy: {}, Val Accuracy: {}".format(epoch, train_loss, val_loss, train_acc, val_acc))
         
@@ -240,7 +240,7 @@ def trainer_multi(EPOCHS, BATCH_SIZE):
             train_bar = tqdm(train_loader, file=sys.stdout)
             for step, (samples, labels) in enumerate(train_bar):
                 
-                # Transfering samples and labels to GPU if available
+                # Transferring samples and labels to GPU if available
                 samples, labels = samples.to(device), labels.to(device)
                 labels = labels.type(torch.int64)
                 
@@ -317,7 +317,7 @@ def trainer_multi(EPOCHS, BATCH_SIZE):
         prefix = _get_current_prefix()
         path_to_saved_model = os.path.join(os.getcwd(), 'PretrainedModelMulti')
 
-        # checking if directory exists if not create one
+        # checking if a directory exists if not create one
         if not os.path.exists(path_to_saved_model):
             os.mkdir(path_to_saved_model)
 
