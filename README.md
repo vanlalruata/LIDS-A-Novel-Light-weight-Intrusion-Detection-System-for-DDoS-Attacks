@@ -29,7 +29,7 @@ Publisher : Wiley<br/>
 
 ## Requirements
 - Python 3.8+ (3.9–3.11 recommended)
-- Windows 10/11 (project paths and scripts are Windows-oriented); Linux/Mac may work with minor path changes
+- Linux/Mac/Windows 10/11
 - CUDA-capable GPU optional (training will fall back to CPU if CUDA unavailable)
 
 Install Python packages:
