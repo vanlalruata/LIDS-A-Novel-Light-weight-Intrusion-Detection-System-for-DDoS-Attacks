@@ -36,11 +36,11 @@ if __name__ == '__main__':
         dataset_choice = int(input('Enter dataset number (1/2/3): '))
 
         if dataset_choice == 1:
-            dataset_path = 'H:/Datasets/CIC-DDoS2019/01-12'
+            dataset_path = '/Datasets/CIC-DDoS2019/01-12'
         elif dataset_choice == 2:
-            dataset_path = 'H:/Datasets/BoT-IoT'
+            dataset_path = '/Datasets/BoT-IoT'
         elif dataset_choice == 3:
-            dataset_path = 'H:/Datasets/TON_IoT/Processed_datasets/Processed_Network_dataset'
+            dataset_path = '/Datasets/TON_IoT/Processed_datasets/Processed_Network_dataset'
         else:
             print('Invalid dataset choice.')
             sys.exit(1)
