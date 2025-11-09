@@ -13,7 +13,7 @@ Title : LIDS: A Novel Framework for Lightweight Detection of DDoS Attacks<br/>
 Journal : Security and Privacy<br/>
 Publisher : Wiley<br/>
 
-> If you find the code useful, you are requested to cite the paper.
+> If you find this code/repository useful, you are requested to cite this paper.
 
 ## Key Features
 - Unified CLI workflow via main.py with menu options for end-to-end runs
@@ -82,7 +82,7 @@ That prefix is used to name outputs like processed CSVs, metrics, and model file
 
 2) Run the CLI
 ```
-python LIDS/main.py
+python main.py
 ```
 
 3) Choose from the menu:
