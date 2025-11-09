@@ -8,7 +8,7 @@ This repository contains a PCA-driven, CNN-based intrusion detection pipeline wi
 The project supports both binary and multi-class classification flows. For CICDDoS2019 specifically, a refined CNN architecture and SHAP-based explainability are integrated into the multi-class trainer.
 
 ### This project source code has been used for the paper:
-DOI : xxxxxx<br/>
+DOI : 10.1002/spy2.70148<br/>
 Title : LIDS: A Novel Framework for Lightweight Detection of DDoS Attacks<br/>
 Journal : Security and Privacy<br/>
 Publisher : Wiley<br/>
