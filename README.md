@@ -9,9 +9,10 @@ The project supports both binary and multi-class classification flows. For CICDD
 
 ### This project source code has been used for the paper:
 DOI : 10.1002/spy2.70148<br/>
-Title : LIDS: A Novel Framework for Lightweight Detection of DDoS Attacks<br/>
+Title : LIDS: A Novel Lightweight Intrusion Detection System for DDoS Attackss<br/>
 Journal : Security and Privacy<br/>
 Publisher : Wiley<br/>
+Paper Link: https://onlinelibrary.wiley.com/doi/10.1002/spy2.70148
 
 > If you find this code/repository useful, you are requested to cite this paper.
 
